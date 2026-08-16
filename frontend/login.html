@@ -71,20 +71,6 @@
             display: block;
         }
 
-        .success {
-            background: #dcfce7;
-            color: #15803d;
-            padding: 0.8rem 1rem;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-            display: none;
-            border-left: 4px solid #15803d;
-        }
-        .success.show {
-            display: block;
-        }
-
         .form-group {
             margin-bottom: 1.2rem;
         }
@@ -199,6 +185,12 @@
         .demo-info strong {
             color: #0ea5e9;
         }
+        .demo-info .admin-hint {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            display: block;
+            margin-top: 2px;
+        }
 
         @media (max-width: 480px) {
             .login-container {
@@ -248,16 +240,15 @@
             Don't have an account? <a href="signup.html">Sign Up</a>
         </div>
 
+        <!-- ✅ UPDATED: Removed Admin credentials from public view -->
         <div class="demo-info">
             <i class="fas fa-info-circle"></i>
             Demo: <strong>demo@prepdoc.com</strong> / <strong>password123</strong>
-            <br>
-            Admin: <strong>aniket808089@gmail.com</strong> / <strong>alphacode@8080</strong>
         </div>
     </div>
 
     <script>
-        // ✅ CORRECT API_BASE - NO /api at the end!
+        // ✅ CORRECT API_BASE
         const API_BASE = 'https://prepdoc-y4k3.onrender.com';
 
         console.log('🔍 API_BASE:', API_BASE);
@@ -296,7 +287,6 @@
                 return;
             }
 
-            // ✅ DEBUG: Show what we're sending
             console.log('📡 Sending login request to:', `${API_BASE}/api/login`);
             console.log('📧 Email:', email);
 
