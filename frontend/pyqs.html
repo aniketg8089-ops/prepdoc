@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
-        /* ===== SAME AS PRACTICE BUT WITH PURPLE THEME ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f0f7ff; color: #1a1a2e; }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
@@ -456,18 +455,28 @@
             document.getElementById('subjectGrid').style.display = 'block';
         }
 
+        // ============================================
+        // ===== LOAD PYQs - FIXED =====
+        // ============================================
         async function loadPYQs(subject, chapter) {
             const subjectMap = { physics: 1, chemistry: 2, biology: 3 };
             const subjectId = subjectMap[subject];
             try {
-                const url = `${API_BASE}/questions?subject_id=${subjectId}&chapter=${encodeURIComponent(chapter)}&section_type=pyqs`;
+                // ✅ Fetch ALL questions for this chapter and filter PYQs
+                const url = `${API_BASE}/api/questions?subject_id=${subjectId}&chapter=${encodeURIComponent(chapter)}`;
+                console.log('📡 Fetching PYQs:', url);
+                
                 const response = await fetch(url);
-                const questions = await response.json();
-                if (questions.length === 0) {
+                const allQuestions = await response.json();
+                
+                // ✅ Filter only PYQ questions
+                const pyqQuestions = allQuestions.filter(q => q.section_type === 'pyqs');
+                
+                if (pyqQuestions.length === 0) {
                     alert(`No PYQ questions for "${chapter}". Please add from Admin Panel.`);
                     return;
                 }
-                currentQuestions = questions;
+                currentQuestions = pyqQuestions;
                 currentIndex = 0;
                 answeredStatus = {};
                 document.getElementById('chaptersContainer').style.display = 'none';

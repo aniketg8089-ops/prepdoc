@@ -124,7 +124,6 @@
         .back-btn:hover { color: #0284c7; }
         .hidden { display: none; }
 
-        /* ===== CBT QUESTION CARD ===== */
         .cbt-container {
             max-width: 850px;
             margin: 0 auto;
@@ -446,18 +445,28 @@
             document.getElementById('subjectGrid').style.display = 'block';
         }
 
+        // ============================================
+        // ===== LOAD PRACTICE - FIXED =====
+        // ============================================
         async function loadPractice(subject, chapter) {
             const subjectMap = { physics: 1, chemistry: 2, biology: 3 };
             const subjectId = subjectMap[subject];
             try {
-                const url = `${API_BASE}/questions?subject_id=${subjectId}&chapter=${encodeURIComponent(chapter)}&section_type=practice`;
+                // ✅ Fetch ALL questions for this chapter and filter practice
+                const url = `${API_BASE}/api/questions?subject_id=${subjectId}&chapter=${encodeURIComponent(chapter)}`;
+                console.log('📡 Fetching practice:', url);
+                
                 const response = await fetch(url);
-                const questions = await response.json();
-                if (questions.length === 0) {
+                const allQuestions = await response.json();
+                
+                // ✅ Filter only practice questions
+                const practiceQuestions = allQuestions.filter(q => q.section_type === 'practice');
+                
+                if (practiceQuestions.length === 0) {
                     alert(`No practice questions for "${chapter}". Please add from Admin Panel.`);
                     return;
                 }
-                currentQuestions = questions;
+                currentQuestions = practiceQuestions;
                 currentIndex = 0;
                 answeredStatus = {};
                 document.getElementById('chaptersContainer').style.display = 'none';
