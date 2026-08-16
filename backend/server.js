@@ -40,7 +40,7 @@ const allowedOrigins = [
   'https://prepdoc-git-main.vercel.app',
   'https://prepdoc.vercel.app',
   'https://prepdoc-api.onrender.com'
-  'https://prepdoc-y4k3.onrender.com
+  'https://prepdoc-y4k3.onrender.com'
 ];
 
 app.use(cors({
