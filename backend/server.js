@@ -39,7 +39,7 @@ const allowedOrigins = [
   'https://prepdoc.vercel.app',
   'https://prepdoc-git-main.vercel.app',
   'https://prepdoc.vercel.app',
-  'https://prepdoc-api.onrender.com'
+  'https://prepdoc-api.onrender.com',
   'https://prepdoc-y4k3.onrender.com'
 ];
 
