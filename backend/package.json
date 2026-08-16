@@ -1,12 +1,12 @@
 {
   "name": "prepdoc-backend",
   "version": "2.0.0",
-  "description": "PrepDOC - NEET Preparation Backend with Admin Panel",
+  "description": "PrepDOC Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "init-db": "node init-db.js",
-    "cleanup": "node cleanup.js"
+    "postinstall": "npm rebuild sqlite3 --force"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,6 +17,9 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.7"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }

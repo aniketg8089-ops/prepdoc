@@ -1,0 +1,3 @@
+# Force rebuild for Linux
+force = true
+python = python3

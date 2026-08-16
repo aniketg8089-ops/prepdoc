@@ -1,6 +1,22 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+
+// ✅ FIX: Rebuild SQLite3 for Linux (Render)
+try {
+    require('sqlite3');
+    console.log('✅ SQLite3 loaded successfully');
+} catch (e) {
+    console.log('⚠️ SQLite3 error, rebuilding for Linux...');
+    const { execSync } = require('child_process');
+    try {
+        execSync('npm rebuild sqlite3', { stdio: 'inherit' });
+        console.log('✅ SQLite3 rebuilt successfully');
+    } catch (rebuildErr) {
+        console.error('❌ Failed to rebuild SQLite3:', rebuildErr.message);
+    }
+}
+
 const db = require('./database.js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -28,7 +44,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
@@ -95,7 +110,6 @@ db.run(`ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0`, (err) => {
 // ============================================
 // ===== FRONTEND SERVE (for local) =====
 // ============================================
-// Check if frontend folder exists
 const frontendPath = path.join(__dirname, '../frontend');
 if (fs.existsSync(frontendPath)) {
     app.use(express.static(frontendPath));
