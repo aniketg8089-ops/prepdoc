@@ -1,0 +1,9 @@
+﻿{
+  "name": "prepdoc",
+  "version": "1.0.0",
+  "description": "PrepDOC - NEET Preparation Platform"
+}
+ "scripts": {
+    "build": "echo 'No build needed'"
+  }
+}
