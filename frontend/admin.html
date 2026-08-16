@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - PrepDOC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f7ff; color: #1a1a2e; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.2rem; }
+
+        .admin-header {
+            background: #fff;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            border: 1px solid #eef2ff;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .admin-header h1 { font-size: 1.8rem; }
+        .admin-header h1 i { color: #0ea5e9; }
+
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #eef2ff;
+            margin-bottom: 2rem;
+        }
+        .card h2 { margin-bottom: 1rem; font-size: 1.3rem; }
+        .card h2 i { color: #0ea5e9; }
+
+        .section-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .section-tabs .tab-btn {
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            border: 2px solid #eef2ff;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-tabs .tab-btn:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        .section-tabs .tab-btn.active {
+            border-color: #0ea5e9;
+            background: #0ea5e9;
+            color: #fff;
+        }
+        .section-tabs .tab-btn .count {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+        }
+        .section-tabs .tab-btn.active .count {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .subject-box {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid #eef2ff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .subject-box:hover {
+            border-color: #0ea5e9;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        }
+        .subject-box .icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+        .subject-box .icon.bio { color: #16a34a; }
+        .subject-box .icon.phy { color: #7c3aed; }
+        .subject-box .icon.chem { color: #db2777; }
+        .subject-box h4 { font-weight: 700; font-size: 1.1rem; }
+        .subject-box .sub-count { font-size: 0.85rem; color: #64748b; }
+
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        .chapter-item {
+            background: #fff;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #eef2ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .chapter-item:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        .chapter-item .ch-name { font-size: 0.9rem; font-weight: 500; }
+        .chapter-item .ch-qs {
+            font-size: 0.75rem;
+            background: #e2e8f0;
+            padding: 2px 10px;
+            border-radius: 50px;
+            color: #475569;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #0ea5e9;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        .back-btn:hover { color: #0284c7; }
+        .hidden { display: none; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .form-group label .required { color: #dc2626; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 2px solid #eef2ff;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .year-group {
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+        }
+        .year-group.active {
+            border-left: 3px solid #6366f1;
+            background: #f8faff;
+        }
+        .year-group .year-required {
+            color: #dc2626;
+            display: none;
+        }
+        .year-group.active .year-required {
+            display: inline;
+        }
+
+        /* ===== WEEKLY SECTION BOXES ===== */
+        .weekly-sections {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .weekly-section-box {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border: 2.5px solid #eef2ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .weekly-section-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        }
+        .weekly-section-box .sec-icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .weekly-section-box .sec-icon.phy { color: #7c3aed; }
+        .weekly-section-box .sec-icon.chem { color: #db2777; }
+        .weekly-section-box .sec-icon.bio { color: #16a34a; }
+        .weekly-section-box h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .weekly-section-box .sec-count {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .weekly-section-box .sec-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 50px;
+            background: #dbeafe;
+            color: #0ea5e9;
+            margin-top: 4px;
+        }
+        .weekly-section-box:nth-child(1) { border-color: #c4b5fd; }
+        .weekly-section-box:nth-child(2) { border-color: #f9a8d4; }
+        .weekly-section-box:nth-child(3) { border-color: #86efac; }
+        .weekly-section-box:nth-child(4) { border-color: #86efac; }
+
+        .weekly-section-box .upload-status {
+            font-size: 0.7rem;
+            margin-top: 0.3rem;
+            color: #94a3b8;
+        }
+        .weekly-section-box .upload-status.uploaded {
+            color: #16a34a;
+        }
+
+        /* ===== CHAPTERS INSIDE WEEKLY SECTION ===== */
+        .weekly-chapters-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #eef2ff;
+            display: none;
+        }
+        .weekly-chapters-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .weekly-chapters-container .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #0ea5e9;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .weekly-chapters-container .back-btn:hover { color: #0284c7; }
+
+        .btn {
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        .btn-primary { background: #0ea5e9; color: #fff; }
+        .btn-primary:hover { background: #0284c7; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-success:hover { background: #15803d; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-warning:hover { background: #d97706; }
+
+        .image-upload-area {
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+            background: #fafbfc;
+        }
+        .image-upload-area:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        .image-upload-area.dragover {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+        .image-upload-area .upload-icon {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+        .image-upload-area .upload-text {
+            font-size: 1.1rem;
+            color: #475569;
+        }
+        .image-upload-area .upload-hint {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 0.3rem;
+        }
+
+        .image-question-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border: 2px solid #eef2ff;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 1rem;
+            align-items: start;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+        .image-question-card:hover {
+            border-color: #0ea5e9;
+        }
+        .image-question-card .card-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #0ea5e9;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .image-question-card .img-preview {
+            width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid #eef2ff;
+            background: #f8fafc;
+        }
+        .image-question-card .img-name {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .image-question-card .fields {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .image-question-card .fields .field-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .image-question-card .fields .field-group label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1a1a2e;
+        }
+        .image-question-card .fields .field-group input,
+        .image-question-card .fields .field-group select {
+            width: 100%;
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #eef2ff;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+        .image-question-card .fields .field-group input:focus,
+        .image-question-card .fields .field-group select:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+        .image-question-card .fields .options-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+        }
+        .image-question-card .fields .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem;
+        }
+
+        .timer-box {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            border: 2px solid #eef2ff;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .timer-box .timer-icon {
+            font-size: 1.5rem;
+            color: #0ea5e9;
+        }
+        .timer-box .timer-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .timer-box .timer-input input {
+            width: 120px;
+            padding: 0.4rem 0.8rem;
+            border: 2px solid #eef2ff;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .timer-box .timer-input input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+        .timer-box .timer-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .auto-filled {
+            border-color: #16a34a !important;
+            background: #f0fdf4 !important;
+        }
+        .auto-filled:focus {
+            border-color: #16a34a !important;
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+        }
+
+        .success-msg {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .success-msg.show { display: block; }
+        .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .error-msg.show { display: block; }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+        .tag-normal { background: #e2e8f0; color: #475569; }
+        .tag-ar { background: #ede9fe; color: #7c3aed; }
+        .tag-statement { background: #fce7f3; color: #db2777; }
+        .tag-image { background: #fef3c7; color: #d97706; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-physics { background: #ede9fe; color: #7c3aed; }
+        .badge-chemistry { background: #fce7f3; color: #db2777; }
+        .badge-biology { background: #dcfce7; color: #16a34a; }
+
+        .table-responsive { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eef2ff;
+        }
+        th { background: #f8fafc; font-weight: 700; }
+
+        .image-cell {
+            max-width: 60px;
+            max-height: 40px;
+            border-radius: 6px;
+        }
+
+        .upload-progress {
+            display: none;
+            margin-top: 1rem;
+        }
+        .upload-progress.show { display: block; }
+        .upload-progress .progress-bar-custom {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .upload-progress .progress-bar-custom .fill {
+            height: 100%;
+            background: #0ea5e9;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        .upload-progress .progress-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+        }
+
+        #autoFillNotification {
+            display: none;
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            color: #15803d;
+            font-weight: 500;
+        }
+        #autoFillNotification.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .weekly-sections {
+                grid-template-columns: 1fr 1fr;
+            }
+            .image-question-card {
+                grid-template-columns: 1fr;
+            }
+            .image-question-card .fields .options-row {
+                grid-template-columns: 1fr;
+            }
+            .image-question-card .fields .bottom-row {
+                grid-template-columns: 1fr;
+            }
+            .subject-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-row-3 { grid-template-columns: 1fr; }
+            .section-tabs { flex-direction: column; }
+            .section-tabs .tab-btn { justify-content: center; }
+            .timer-box { flex-direction: column; align-items: stretch; }
+            .timer-box .timer-input input { width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .weekly-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-user-cog"></i> Admin Panel</h1>
+            <div>
+                <a href="index.html" class="btn btn-primary"><i class="fas fa-home"></i> Home</a>
+                <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="success-msg" id="successMsg"><i class="fas fa-check-circle"></i> <span id="successText"></span></div>
+        <div class="error-msg" id="errorMsg"><i class="fas fa-exclamation-circle"></i> <span id="errorText"></span></div>
+
+        <!-- Auto-Fill Notification -->
+        <div id="autoFillNotification">
+            <i class="fas fa-check-circle"></i>
+            <span id="autoFillText">Fields auto-filled from selection!</span>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== SECTION TABS ===== -->
+        <!-- ============================================ -->
+        <div class="section-tabs">
+            <button class="tab-btn active" onclick="switchTab('testseries')">
+                <i class="fas fa-pen-fancy"></i> Test Series
+                <span class="count" id="testCount">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('practice')">
+                <i class="fas fa-book-open"></i> Practice
+                <span class="count" id="practiceCount">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('pyqs')">
+                <i class="fas fa-history"></i> PYQs
+                <span class="count" id="pyqCount">0</span>
+            </button>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== TAB 1: TEST SERIES ===== -->
+        <!-- ============================================ -->
+        <div class="tab-content active" id="tab-testseries">
+            <div class="card">
+                <h2><i class="fas fa-pen-fancy"></i> Test Series Questions</h2>
+                <p style="color:#64748b;margin-bottom:1rem;">Select a test type to add questions</p>
+
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+                    <button class="btn btn-primary" onclick="showTestType('chapterwise')">
+                        <i class="fas fa-book"></i> Chapterwise
+                    </button>
+                    <button class="btn btn-warning" onclick="showTestType('weekly')">
+                        <i class="fas fa-calendar-week"></i> Weekly
+                    </button>
+                    <button class="btn btn-success" onclick="showTestType('fullsyllabus')">
+                        <i class="fas fa-trophy"></i> Full Syllabus
+                    </button>
+                </div>
+
+                <!-- Chapterwise -->
+                <div id="testChapterwise" style="display:block;">
+                    <div class="subject-grid">
+                        <div class="subject-box" onclick="showTestChapters('physics')">
+                            <span class="icon phy"><i class="fas fa-atom"></i></span>
+                            <h4>Physics</h4>
+                            <div class="sub-count">28 Chapters</div>
+                        </div>
+                        <div class="subject-box" onclick="showTestChapters('chemistry')">
+                            <span class="icon chem"><i class="fas fa-flask"></i></span>
+                            <h4>Chemistry</h4>
+                            <div class="sub-count">26 Chapters</div>
+                        </div>
+                        <div class="subject-box" onclick="showTestChapters('biology')">
+                            <span class="icon bio"><i class="fas fa-leaf"></i></span>
+                            <h4>Biology</h4>
+                            <div class="sub-count">29 Chapters</div>
+                        </div>
+                    </div>
+                    <div id="testChaptersContainer"></div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- ===== WEEKLY TEST - 4 SECTIONS WITH CHAPTERS ===== -->
+                <!-- ============================================ -->
+                <div id="testWeekly" style="display:none;">
+                    <div style="margin-bottom:1rem;">
+                        <h3 style="color:#db2777;margin-bottom:0.3rem;">📅 Weekly Test Structure</h3>
+                        <p style="color:#64748b;font-size:0.9rem;">
+                            Each week has 4 sections: <strong>Physics</strong> (45 Qs), <strong>Chemistry</strong> (45 Qs), 
+                            <strong>Biology 1</strong> (45 Qs), <strong>Biology 2</strong> (45 Qs) = Total 180 Questions
+                            <br><strong>⏱️ Timer: 3h 20m (200 minutes)</strong>
+                            <br><strong>Click on any section to select a chapter</strong>
+                        </p>
+                    </div>
+
+                    <!-- Week Selector -->
+                    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+                        <button class="btn btn-primary" onclick="showWeek('week1')">Week 1</button>
+                        <button class="btn btn-primary" onclick="showWeek('week2')">Week 2</button>
+                        <button class="btn btn-primary" onclick="showWeek('week3')">Week 3</button>
+                        <button class="btn btn-primary" onclick="showWeek('week4')">Week 4</button>
+                        <button class="btn btn-primary" onclick="showWeek('week5')">Week 5</button>
+                        <button class="btn btn-primary" onclick="showWeek('week6')">Week 6</button>
+                        <button class="btn btn-primary" onclick="showWeek('week7')">Week 7</button>
+                        <button class="btn btn-primary" onclick="showWeek('week8')">Week 8</button>
+                    </div>
+
+                    <!-- Week 1 -->
+                    <div id="week1" style="display:block;">
+                        <div class="weekly-sections">
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week1', 'physics', 'phy')">
+                                <span class="sec-icon phy"><i class="fas fa-atom"></i></span>
+                                <h4>Physics</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 1</span>
+                                <div class="upload-status" id="week1_phy_status">⏳ Select Chapter</div>
+                            </div>
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week1', 'chemistry', 'chem')">
+                                <span class="sec-icon chem"><i class="fas fa-flask"></i></span>
+                                <h4>Chemistry</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 2</span>
+                                <div class="upload-status" id="week1_chem_status">⏳ Select Chapter</div>
+                            </div>
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week1', 'biology', 'bio1')">
+                                <span class="sec-icon bio"><i class="fas fa-leaf"></i></span>
+                                <h4>Biology 1</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 3</span>
+                                <div class="upload-status" id="week1_bio1_status">⏳ Select Chapter</div>
+                            </div>
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week1', 'biology', 'bio2')">
+                                <span class="sec-icon bio"><i class="fas fa-dna"></i></span>
+                                <h4>Biology 2</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 4</span>
+                                <div class="upload-status" id="week1_bio2_status">⏳ Select Chapter</div>
+                            </div>
+                        </div>
+
+                        <!-- Physics Chapters Container -->
+                        <div class="weekly-chapters-container" id="week1_phy_chapters">
+                            <button class="back-btn" onclick="hideWeeklyChapters('week1_phy_chapters')">
+                                <i class="fas fa-arrow-left"></i> Back to Sections
+                            </button>
+                            <h4 style="margin-bottom:0.8rem;color:#7c3aed;">Physics Chapters</h4>
+                            <div class="chapters-grid" id="week1_phy_chapter_list"></div>
+                        </div>
+
+                        <!-- Chemistry Chapters Container -->
+                        <div class="weekly-chapters-container" id="week1_chem_chapters">
+                            <button class="back-btn" onclick="hideWeeklyChapters('week1_chem_chapters')">
+                                <i class="fas fa-arrow-left"></i> Back to Sections
+                            </button>
+                            <h4 style="margin-bottom:0.8rem;color:#db2777;">Chemistry Chapters</h4>
+                            <div class="chapters-grid" id="week1_chem_chapter_list"></div>
+                        </div>
+
+                        <!-- Biology 1 Chapters Container -->
+                        <div class="weekly-chapters-container" id="week1_bio1_chapters">
+                            <button class="back-btn" onclick="hideWeeklyChapters('week1_bio1_chapters')">
+                                <i class="fas fa-arrow-left"></i> Back to Sections
+                            </button>
+                            <h4 style="margin-bottom:0.8rem;color:#16a34a;">Biology Chapters</h4>
+                            <div class="chapters-grid" id="week1_bio1_chapter_list"></div>
+                        </div>
+
+                        <!-- Biology 2 Chapters Container -->
+                        <div class="weekly-chapters-container" id="week1_bio2_chapters">
+                            <button class="back-btn" onclick="hideWeeklyChapters('week1_bio2_chapters')">
+                                <i class="fas fa-arrow-left"></i> Back to Sections
+                            </button>
+                            <h4 style="margin-bottom:0.8rem;color:#16a34a;">Biology Chapters</h4>
+                            <div class="chapters-grid" id="week1_bio2_chapter_list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Week 2-8 (Simplified - same structure) -->
+                    <div id="week2" style="display:none;">
+                        <div class="weekly-sections">
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week2', 'physics', 'phy')">
+                                <span class="sec-icon phy"><i class="fas fa-atom"></i></span>
+                                <h4>Physics</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 1</span>
+                                <div class="upload-status" id="week2_phy_status">⏳ Select Chapter</div>
+                            </div>
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week2', 'chemistry', 'chem')">
+                                <span class="sec-icon chem"><i class="fas fa-flask"></i></span>
+                                <h4>Chemistry</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 2</span>
+                                <div class="upload-status" id="week2_chem_status">⏳ Select Chapter</div>
+                            </div>
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week2', 'biology', 'bio1')">
+                                <span class="sec-icon bio"><i class="fas fa-leaf"></i></span>
+                                <h4>Biology 1</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 3</span>
+                                <div class="upload-status" id="week2_bio1_status">⏳ Select Chapter</div>
+                            </div>
+                            <div class="weekly-section-box" onclick="showWeeklyChapters('week2', 'biology', 'bio2')">
+                                <span class="sec-icon bio"><i class="fas fa-dna"></i></span>
+                                <h4>Biology 2</h4>
+                                <div class="sec-count">45 Questions</div>
+                                <span class="sec-tag">Section 4</span>
+                                <div class="upload-status" id="week2_bio2_status">⏳ Select Chapter</div>
+                            </div>
+                        </div>
+                        <!-- Chapters containers for week 2-8 -->
+                        <div class="weekly-chapters-container" id="week2_phy_chapters"><div class="chapters-grid"></div></div>
+                        <div class="weekly-chapters-container" id="week2_chem_chapters"><div class="chapters-grid"></div></div>
+                        <div class="weekly-chapters-container" id="week2_bio1_chapters"><div class="chapters-grid"></div></div>
+                        <div class="weekly-chapters-container" id="week2_bio2_chapters"><div class="chapters-grid"></div></div>
+                    </div>
+                    <div id="week3" style="display:none;"><div class="weekly-sections"><!-- Same structure --></div></div>
+                    <div id="week4" style="display:none;"><div class="weekly-sections"><!-- Same structure --></div></div>
+                    <div id="week5" style="display:none;"><div class="weekly-sections"><!-- Same structure --></div></div>
+                    <div id="week6" style="display:none;"><div class="weekly-sections"><!-- Same structure --></div></div>
+                    <div id="week7" style="display:none;"><div class="weekly-sections"><!-- Same structure --></div></div>
+                    <div id="week8" style="display:none;"><div class="weekly-sections"><!-- Same structure --></div></div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- ===== FULL SYLLABUS (No Syllabus Section) ===== -->
+                <!-- ============================================ -->
+                <div id="testFullSyllabus" style="display:none;">
+                    <p style="color:#64748b;margin-bottom:1rem;">
+                        Add questions for full syllabus tests 
+                        <strong style="color:#16a34a;">⏱️ Timer: 3h 20m (200 minutes)</strong>
+                    </p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin-top:1rem;">
+                        <div class="chapter-item" onclick="autoFillFullSyllabus('1', 'Full Syllabus - NEET Mega Mock 2026')">
+                            <span class="ch-name">🏆 NEET Mega Mock 2026</span>
+                            <span class="ch-qs">⏱️ 3h 20m</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillFullSyllabus('1', 'Full Syllabus - NEET Grand Test 2025')">
+                            <span class="ch-name">🏆 NEET Grand Test 2025</span>
+                            <span class="ch-qs">⏱️ 3h 20m</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillFullSyllabus('1', 'Full Syllabus - NEET Advanced Mock')">
+                            <span class="ch-name">🏆 NEET Advanced Mock</span>
+                            <span class="ch-qs">⏱️ 3h 20m</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillFullSyllabus('3', 'Full Syllabus - NEET Biology Special')">
+                            <span class="ch-name">🏆 NEET Biology Special</span>
+                            <span class="ch-qs">⏱️ 3h 20m</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillFullSyllabus('1', 'Full Syllabus - NEET Physics + Chemistry')">
+                            <span class="ch-name">🏆 NEET Physics + Chemistry</span>
+                            <span class="ch-qs">⏱️ 3h 20m</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillFullSyllabus('1', 'Full Syllabus - NEET Complete Mock')">
+                            <span class="ch-name">🏆 NEET Complete Mock</span>
+                            <span class="ch-qs">⏱️ 3h 20m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== TAB 2: PRACTICE ===== -->
+        <!-- ============================================ -->
+        <div class="tab-content" id="tab-practice">
+            <div class="card">
+                <h2><i class="fas fa-book-open"></i> Practice Questions</h2>
+                <p style="color:#64748b;margin-bottom:1rem;">Select a subject to add practice questions chapterwise</p>
+
+                <div class="subject-grid">
+                    <div class="subject-box" onclick="showPracticeChapters('physics')">
+                        <span class="icon phy"><i class="fas fa-atom"></i></span>
+                        <h4>Physics Practice</h4>
+                        <div class="sub-count">28 Chapters • 3,120 Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPracticeChapters('chemistry')">
+                        <span class="icon chem"><i class="fas fa-flask"></i></span>
+                        <h4>Chemistry Practice</h4>
+                        <div class="sub-count">26 Chapters • 2,980 Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPracticeChapters('biology')">
+                        <span class="icon bio"><i class="fas fa-leaf"></i></span>
+                        <h4>Biology Practice</h4>
+                        <div class="sub-count">29 Chapters • 4,520 Qs</div>
+                    </div>
+                </div>
+
+                <div id="practiceChaptersContainer"></div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== TAB 3: PYQs ===== -->
+        <!-- ============================================ -->
+        <div class="tab-content" id="tab-pyqs">
+            <div class="card">
+                <h2><i class="fas fa-history"></i> PYQ Questions</h2>
+                <p style="color:#64748b;margin-bottom:1rem;">Select a subject to add PYQs chapterwise with year filter</p>
+
+                <div class="subject-grid">
+                    <div class="subject-box" onclick="showPYQChapters('physics')">
+                        <span class="icon phy"><i class="fas fa-atom"></i></span>
+                        <h4>Physics PYQs</h4>
+                        <div class="sub-count">28 Chapters • 500+ Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPYQChapters('chemistry')">
+                        <span class="icon chem"><i class="fas fa-flask"></i></span>
+                        <h4>Chemistry PYQs</h4>
+                        <div class="sub-count">26 Chapters • 450+ Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPYQChapters('biology')">
+                        <span class="icon bio"><i class="fas fa-leaf"></i></span>
+                        <h4>Biology PYQs</h4>
+                        <div class="sub-count">29 Chapters • 600+ Qs</div>
+                    </div>
+                </div>
+
+                <div id="pyqChaptersContainer"></div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== BULK IMAGE UPLOAD ===== -->
+        <!-- ============================================ -->
+        <div class="card">
+            <h2><i class="fas fa-images"></i> Bulk Image Questions Upload</h2>
+            <p style="color:#64748b;margin-bottom:1rem;">
+                Select images (question + options are in the image). Students will see image on top and A,B,C,D options below.
+                <br><strong>✅ Images will be stored in Cloudinary (Online)!</strong>
+            </p>
+
+            <form id="bulkImageForm" enctype="multipart/form-data">
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Section <span class="required">*</span></label>
+                        <select id="bulk_image_section" required>
+                            <option value="">Select Section</option>
+                            <option value="testseries">Test Series</option>
+                            <option value="practice">Practice</option>
+                            <option value="pyqs">PYQs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject <span class="required">*</span></label>
+                        <select id="bulk_image_subject" required>
+                            <option value="">Select Subject</option>
+                            <option value="1">Physics</option>
+                            <option value="2">Chemistry</option>
+                            <option value="3">Biology</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label id="chapterLabel">Chapter/Syllabus <span class="required">*</span></label>
+                        <input type="text" id="bulk_image_chapter" placeholder="e.g., Cell Biology" required />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="display:none;">
+                        <label>Difficulty</label>
+                        <select id="bulk_image_difficulty">
+                            <option value="Medium">Medium</option>
+                        </select>
+                    </div>
+                    <div class="form-group year-group" id="bulkImageYearGroup">
+                        <label>
+                            Year
+                            <span class="year-required" id="bulkImageYearRequired" style="display:none;">*</span>
+                            <span style="font-size:0.75rem;color:#64748b;font-weight:400;" id="bulkImageYearHint">Only for PYQs</span>
+                        </label>
+                        <input type="number" id="bulk_image_year" placeholder="2025" />
+                    </div>
+                </div>
+
+                <!-- Timer Box -->
+                <div class="timer-box">
+                    <div class="timer-icon"><i class="fas fa-clock"></i></div>
+                    <div class="timer-input">
+                        <label style="font-weight:600;font-size:0.9rem;">Timer:</label>
+                        <input type="number" id="bulk_timer_minutes" value="200" min="1" max="300" />
+                        <span style="font-size:0.9rem;font-weight:500;">minutes</span>
+                    </div>
+                    <div class="timer-hint">
+                        <i class="fas fa-info-circle"></i> <strong>Default: 3h 20m</strong> (200 min) for Weekly & Full Syllabus
+                    </div>
+                </div>
+
+                <!-- Image Upload Area -->
+                <div class="image-upload-area" id="imageDropArea">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-text">Drag & drop images here, or click to select</div>
+                    <div class="upload-hint">JPG, PNG, GIF, WebP • Max 5MB each • Multiple images allowed</div>
+                    <input type="file" id="bulk_image_files" name="images" accept="image/*" multiple style="display:none;" />
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('bulk_image_files').click()">
+                        <i class="fas fa-folder-open"></i> Select Images
+                    </button>
+                </div>
+
+                <!-- Image Question Cards Container -->
+                <div id="imageQuestionContainer" style="margin-top:1rem;">
+                    <p style="color:#94a3b8;text-align:center;padding:1rem;">
+                        <i class="fas fa-info-circle"></i> Select images above. For each image, only select the correct answer (A/B/C/D) and add explanation.
+                        <br><strong>Question and options are in the image!</strong>
+                    </p>
+                </div>
+
+                <!-- Progress -->
+                <div class="upload-progress" id="bulkImageProgress">
+                    <div class="progress-bar-custom">
+                        <div class="fill" id="bulkImageProgressFill" style="width:0%"></div>
+                    </div>
+                    <div class="progress-text" id="bulkImageProgressText">Uploading... 0%</div>
+                </div>
+
+                <button type="submit" class="btn btn-success" id="bulkImageSubmitBtn" style="margin-top:1rem;">
+                    <i class="fas fa-upload"></i> Upload All Questions
+                </button>
+            </form>
+        </div>
+
+        <!-- Question List -->
+        <div class="card">
+            <h2><i class="fas fa-list"></i> All Questions (<span id="questionCount">0</span>)</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead><tr>
+                        <th>#</th><th>Section</th><th>Subject</th><th>Chapter</th>
+                        <th>Question</th><th>Type</th><th>Year</th><th>Image</th><th>Action</th>
+                    </tr></thead>
+                    <tbody id="questionList">
+                        <tr><td colspan="9" style="text-align:center;color:#94a3b8;">Loading questions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://prepdoc-api.onrender.com';
+        let imageQuestionsData = [];
+
+        // ============================================
+        // ===== CHAPTER DATA =====
+        // ============================================
+        const chaptersData = {
+            physics: ['Basic Mathematics','Units and Measurements','Motion in a Straight Line','Motion in a Plane','Laws of Motion','Work, Energy and Power','System of Particles','Rotation Motion','Gravitation','Mechanical Properties of Solid','Mechanical Properties of Fluids','Thermal Properties of Matter','Thermodynamics','Kinetic Theory of Gases','Oscillations','Waves','Electrostatic','Capacitance','Current Electricity','Moving Charges & Magnetism','Magnetism & Matter','EMI','Alternating Current','Electromagnetic Waves','Ray optics','Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei'],
+            chemistry: ['Some Basic Concept of Chemistry','Structure of Atom','Classification of Elements & Periodicity','Chemical Bonding','Thermodynamics','Chemical Equilibrium','Ionic Equilibrium','Redox Reactions','p-Block Elements (Group 13 & 14)','Organic Chemistry: Some Basic Principles & Techniques','Hydrocarbons','Solutions','Electrochemistry','Chemical Kinetics','p-Block Elements (Group 15,16,17,18)','d & f-Block Elements','Coordination Compounds','Haloalkanes & Haloarenes','Alcohol, Phenol and Ether','Aldehyde and Ketone','Carboxylic Acid','Amines','Biomolecules','Practical Chemistry'],
+            biology: ['Living World','Biological Classification','Plant Kingdom','Animal Kingdom','Morphology of Flowering Plants','Anatomy of Flowering Plants','Structural Organisation in Animals','Cell-The Unit of Life','Biomolecules','Cell Cycle and Cell Division','Photosynthesis in Higher Plants','Respiration in Plants','Plant Growth and Development','Breathing and Exchange of Gases','Body Fluids and Circulation','Excretory Products & their elimination','Locomotion and movements','Neural Control and Coordination','Chemical Coordination and Integration','Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health','Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution','Human Health & Diseases','Microbes in human Welfare','Biotechnology- Principles and Processes','Biotechnology and Its Application']
+        };
+
+        // ============================================
+        // ===== SECTION CHANGE - YEAR SHOW/HIDE =====
+        // ============================================
+        document.getElementById('bulk_image_section').addEventListener('change', function() {
+            const yearGroup = document.getElementById('bulkImageYearGroup');
+            const yearInput = document.getElementById('bulk_image_year');
+            const yearRequired = document.getElementById('bulkImageYearRequired');
+            const yearHint = document.getElementById('bulkImageYearHint');
+            
+            if (this.value === 'pyqs') {
+                yearGroup.classList.add('active');
+                yearInput.required = true;
+                yearRequired.style.display = 'inline';
+                yearHint.textContent = '* Required';
+            } else {
+                yearGroup.classList.remove('active');
+                yearInput.required = false;
+                yearRequired.style.display = 'none';
+                yearHint.textContent = 'Only for PYQs';
+                yearInput.value = '';
+            }
+
+            const chapterLabel = document.getElementById('chapterLabel');
+            if (this.value === 'fullsyllabus') {
+                chapterLabel.innerHTML = 'Syllabus <span class="required">*</span>';
+            } else {
+                chapterLabel.innerHTML = 'Chapter/Syllabus <span class="required">*</span>';
+            }
+        });
+
+        // ============================================
+        // ===== SECTION TABS =====
+        // ============================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+        }
+
+        // ============================================
+        // ===== TEST SERIES FUNCTIONS =====
+        // ============================================
+        function showTestType(type) {
+            document.getElementById('testChapterwise').style.display = 'none';
+            document.getElementById('testWeekly').style.display = 'none';
+            document.getElementById('testFullSyllabus').style.display = 'none';
+            
+            if (type === 'chapterwise') {
+                document.getElementById('testChapterwise').style.display = 'block';
+            } else if (type === 'weekly') {
+                document.getElementById('testWeekly').style.display = 'block';
+                showWeek('week1');
+            } else if (type === 'fullsyllabus') {
+                document.getElementById('testFullSyllabus').style.display = 'block';
+            }
+        }
+
+        // ============================================
+        // ===== WEEK FUNCTIONS =====
+        // ============================================
+        function showWeek(weekId) {
+            console.log('🔵 Showing week:', weekId);
+            for (let i = 1; i <= 8; i++) {
+                document.getElementById('week' + i).style.display = 'none';
+            }
+            const weekDiv = document.getElementById(weekId);
+            if (weekDiv) {
+                weekDiv.style.display = 'block';
+                console.log('✅ Week displayed:', weekId);
+            } else {
+                console.error('❌ Week not found:', weekId);
+            }
+            
+            document.querySelectorAll('#testWeekly .btn-primary').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = '#0ea5e9';
+                btn.style.color = '#fff';
+            });
+            const buttons = document.querySelectorAll('#testWeekly .btn-primary');
+            const weekNum = parseInt(weekId.replace('week', ''));
+            if (buttons[weekNum - 1]) {
+                buttons[weekNum - 1].style.background = '#0284c7';
+                buttons[weekNum - 1].style.color = '#fff';
+                buttons[weekNum - 1].classList.add('active');
+            }
+        }
+
+        // ============================================
+        // ===== WEEKLY CHAPTERS - SHOW/HIDE =====
+        // ============================================
+        function showWeeklyChapters(week, subject, sectionId) {
+            console.log('🔵 showWeeklyChapters called:', { week, subject, sectionId });
+            
+            const weekDiv = document.getElementById(week);
+            if (!weekDiv) {
+                console.error('❌ Week div not found:', week);
+                return;
+            }
+            
+            // Hide all chapter containers in this week
+            const containers = weekDiv.querySelectorAll('.weekly-chapters-container');
+            containers.forEach(c => c.classList.remove('active'));
+            
+            // Show selected container
+            const targetId = week + '_' + sectionId + '_chapters';
+            console.log('🔍 Target ID:', targetId);
+            let target = document.getElementById(targetId);
+            
+            if (target) {
+                target.classList.add('active');
+                console.log('✅ Chapters container activated:', targetId);
+                
+                // Load chapters if not already loaded
+                const listId = targetId + '_list';
+                const list = document.getElementById(listId);
+                
+                if (list && list.children.length === 0) {
+                    const chapters = chaptersData[subject] || [];
+                    console.log('📚 Loading chapters for:', subject, chapters.length);
+                    list.innerHTML = chapters.map((ch, i) => `
+                        <div class="chapter-item" onclick="autoFillWeeklyChapter('${week}', '${subject}', '${ch}', '${sectionId}')">
+                            <span class="ch-name">${i+1}. ${ch}</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                    `).join('');
+                    console.log('✅ Chapters loaded:', list.children.length);
+                }
+            } else {
+                console.error('❌ Target not found, creating:', targetId);
+                // Create container if not exists
+                target = createWeeklyChaptersContainer(week, subject, sectionId);
+            }
+            
+            // Scroll to chapters
+            if (target) {
+                setTimeout(() => {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+
+        // ============================================
+        // ===== CREATE WEEKLY CHAPTERS CONTAINER =====
+        // ============================================
+        function createWeeklyChaptersContainer(week, subject, sectionId) {
+            console.log('🔧 Creating container for:', week, subject, sectionId);
+            const weekDiv = document.getElementById(week);
+            if (!weekDiv) return null;
+            
+            const targetId = week + '_' + sectionId + '_chapters';
+            
+            // Check if container already exists
+            let container = document.getElementById(targetId);
+            if (container) {
+                container.classList.add('active');
+                return container;
+            }
+            
+            // Create container
+            container = document.createElement('div');
+            container.className = 'weekly-chapters-container active';
+            container.id = targetId;
+            
+            const listId = targetId + '_list';
+            const chapters = chaptersData[subject] || [];
+            const subjectName = subject.charAt(0).toUpperCase() + subject.slice(1);
+            const color = subject === 'physics' ? '#7c3aed' : subject === 'chemistry' ? '#db2777' : '#16a34a';
+            
+            container.innerHTML = `
+                <button class="back-btn" onclick="hideWeeklyChapters('${targetId}')">
+                    <i class="fas fa-arrow-left"></i> Back to Sections
+                </button>
+                <h4 style="margin-bottom:0.8rem;color:${color};">
+                    ${subjectName} Chapters
+                </h4>
+                <div class="chapters-grid" id="${listId}">
+                    ${chapters.map((ch, i) => `
+                        <div class="chapter-item" onclick="autoFillWeeklyChapter('${week}', '${subject}', '${ch}', '${sectionId}')">
+                            <span class="ch-name">${i+1}. ${ch}</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            weekDiv.appendChild(container);
+            console.log('✅ Created chapters container:', targetId);
+            return container;
+        }
+
+        function hideWeeklyChapters(containerId) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.classList.remove('active');
+                console.log('🔒 Hidden container:', containerId);
+            }
+        }
+
+        // ============================================
+        // ===== AUTO-FILL WEEKLY CHAPTER =====
+        // ============================================
+        function autoFillWeeklyChapter(week, subject, chapter, sectionId) {
+            const subjectNames = { 'physics': 'Physics', 'chemistry': 'Chemistry', 'biology': 'Biology' };
+            const sectionNames = {
+                'phy': 'Physics (45 Qs)',
+                'chem': 'Chemistry (45 Qs)',
+                'bio1': 'Biology 1 (45 Qs)',
+                'bio2': 'Biology 2 (45 Qs)'
+            };
+            const subjectIds = { 'physics': '1', 'chemistry': '2', 'biology': '3' };
+            
+            const weekDisplay = week.charAt(0).toUpperCase() + week.slice(1);
+            const weekTitle = weekDisplay.replace('week', 'Week ');
+            const chapterName = `${weekTitle} - ${sectionNames[sectionId] || subjectNames[subject]} - ${chapter}`;
+            
+            document.getElementById('bulk_image_section').value = 'testseries';
+            document.getElementById('bulk_image_subject').value = subjectIds[subject] || '1';
+            document.getElementById('bulk_image_chapter').value = chapterName;
+            
+            document.getElementById('bulk_image_section').classList.add('auto-filled');
+            document.getElementById('bulk_image_subject').classList.add('auto-filled');
+            document.getElementById('bulk_image_chapter').classList.add('auto-filled');
+            
+            document.getElementById('bulk_timer_minutes').value = 200;
+            
+            const notification = document.getElementById('autoFillNotification');
+            const text = document.getElementById('autoFillText');
+            text.textContent = `✅ Auto-filled: Weekly Test → ${subjectNames[subject]} → "${chapter}" | ⏱️ 3h 20m`;
+            notification.classList.add('show');
+            
+            // Hide chapter container
+            const containerId = week + '_' + sectionId + '_chapters';
+            hideWeeklyChapters(containerId);
+            
+            // Update status
+            const statusId = week + '_' + sectionId + '_status';
+            const statusEl = document.getElementById(statusId);
+            if (statusEl) {
+                statusEl.textContent = `✅ ${chapter}`;
+                statusEl.className = 'upload-status uploaded';
+            }
+            
+            document.getElementById('bulkImageForm').scrollIntoView({ behavior: 'smooth' });
+            
+            setTimeout(() => {
+                document.getElementById('bulk_image_section').classList.remove('auto-filled');
+                document.getElementById('bulk_image_subject').classList.remove('auto-filled');
+                document.getElementById('bulk_image_chapter').classList.remove('auto-filled');
+            }, 3000);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // ============================================
+        // ===== CHAPTER FUNCTIONS (for Chapterwise) =====
+        // ============================================
+        function renderChapters(containerId, subject, sectionType) {
+            const container = document.getElementById(containerId);
+            const chapters = chaptersData[subject] || [];
+            const subjectIds = { 'physics': '1', 'chemistry': '2', 'biology': '3' };
+            const subjectId = subjectIds[subject] || '1';
+            const sectionMap = { 'testseries': 'testseries', 'practice': 'practice', 'pyqs': 'pyqs' };
+            const currentSection = sectionMap[sectionType] || 'testseries';
+            
+            let html = `<button class="back-btn" onclick="document.getElementById('${containerId}').innerHTML = ''; document.getElementById('subjectGrid').style.display = 'grid';">
+                <i class="fas fa-arrow-left"></i> Back to Subjects
+            </button>
+            <h4 style="margin-bottom:0.8rem;color:#0ea5e9;">${subject.charAt(0).toUpperCase() + subject.slice(1)} Chapters</h4>
+            <div class="chapters-grid">`;
+            
+            chapters.forEach((ch, i) => {
+                html += `
+                    <div class="chapter-item" onclick="autoFillBulkForm('${currentSection}', '${subjectId}', '${ch}')">
+                        <span class="ch-name">${i+1}. ${ch}</span>
+                        <span class="ch-qs">Select</span>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            container.innerHTML = html;
+            container.style.display = 'block';
+        }
+
+        function showTestChapters(subject) {
+            document.getElementById('testChaptersContainer').style.display = 'block';
+            renderChapters('testChaptersContainer', subject, 'testseries');
+        }
+
+        function showPracticeChapters(subject) {
+            document.getElementById('practiceChaptersContainer').style.display = 'block';
+            renderChapters('practiceChaptersContainer', subject, 'practice');
+        }
+
+        function showPYQChapters(subject) {
+            const year = prompt('Enter Year for PYQs (e.g., 2025):', '2025');
+            if (year) {
+                document.getElementById('pyqChaptersContainer').style.display = 'block';
+                renderChapters('pyqChaptersContainer', subject, 'pyqs');
+            }
+        }
+
+        // ============================================
+        // ===== AUTO-FILL FULL SYLLABUS =====
+        // ============================================
+        function autoFillFullSyllabus(subjectId, chapter) {
+            const subjectNames = { '1': 'Physics', '2': 'Chemistry', '3': 'Biology' };
+            
+            document.getElementById('bulk_image_section').value = 'testseries';
+            document.getElementById('bulk_image_subject').value = subjectId;
+            document.getElementById('bulk_image_chapter').value = chapter;
+            
+            document.getElementById('bulk_image_section').classList.add('auto-filled');
+            document.getElementById('bulk_image_subject').classList.add('auto-filled');
+            document.getElementById('bulk_image_chapter').classList.add('auto-filled');
+            
+            document.getElementById('bulk_timer_minutes').value = 200;
+            
+            const notification = document.getElementById('autoFillNotification');
+            const text = document.getElementById('autoFillText');
+            text.textContent = `✅ Auto-filled: Full Syllabus → ${subjectNames[subjectId]} → "${chapter}" | ⏱️ 3h 20m`;
+            notification.classList.add('show');
+            
+            document.getElementById('bulkImageForm').scrollIntoView({ behavior: 'smooth' });
+            
+            setTimeout(() => {
+                document.getElementById('bulk_image_section').classList.remove('auto-filled');
+                document.getElementById('bulk_image_subject').classList.remove('auto-filled');
+                document.getElementById('bulk_image_chapter').classList.remove('auto-filled');
+            }, 3000);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // ============================================
+        // ===== AUTO-FILL BULK IMAGE FORM =====
+        // ============================================
+        function autoFillBulkForm(section, subjectId, chapter) {
+            const subjectNames = { '1': 'Physics', '2': 'Chemistry', '3': 'Biology' };
+            const sectionNames = { 'testseries': 'Test Series', 'practice': 'Practice', 'pyqs': 'PYQs' };
+            
+            document.getElementById('bulk_image_section').value = section;
+            document.getElementById('bulk_image_subject').value = subjectId;
+            document.getElementById('bulk_image_chapter').value = chapter;
+            
+            document.getElementById('bulk_image_section').classList.add('auto-filled');
+            document.getElementById('bulk_image_subject').classList.add('auto-filled');
+            document.getElementById('bulk_image_chapter').classList.add('auto-filled');
+            
+            const notification = document.getElementById('autoFillNotification');
+            const text = document.getElementById('autoFillText');
+            text.textContent = `✅ Auto-filled: ${sectionNames[section]} → ${subjectNames[subjectId]} → "${chapter}"`;
+            notification.classList.add('show');
+            
+            if (section === 'pyqs') {
+                document.getElementById('bulkImageYearGroup').classList.add('active');
+                document.getElementById('bulk_image_year').required = true;
+                document.getElementById('bulkImageYearRequired').style.display = 'inline';
+                document.getElementById('bulkImageYearHint').textContent = '* Required';
+            } else {
+                document.getElementById('bulkImageYearGroup').classList.remove('active');
+                document.getElementById('bulk_image_year').required = false;
+                document.getElementById('bulkImageYearRequired').style.display = 'none';
+                document.getElementById('bulkImageYearHint').textContent = 'Only for PYQs';
+                document.getElementById('bulk_image_year').value = '';
+            }
+            
+            document.getElementById('bulkImageForm').scrollIntoView({ behavior: 'smooth' });
+            
+            setTimeout(() => {
+                document.getElementById('bulk_image_section').classList.remove('auto-filled');
+                document.getElementById('bulk_image_subject').classList.remove('auto-filled');
+                document.getElementById('bulk_image_chapter').classList.remove('auto-filled');
+            }, 3000);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        // ============================================
+        // ===== IMAGE PREVIEW =====
+        // ============================================
+        document.getElementById('bulk_image_files').addEventListener('change', function(e) {
+            const files = Array.from(this.files);
+            if (files.length === 0) return;
+
+            imageQuestionsData = [];
+            const container = document.getElementById('imageQuestionContainer');
+            container.innerHTML = '';
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const imageData = ev.target.result;
+
+                    imageQuestionsData.push({
+                        index: index,
+                        filename: file.name,
+                        image_data: imageData
+                    });
+
+                    const card = document.createElement('div');
+                    card.className = 'image-question-card';
+                    card.id = `img-card-${index}`;
+                    card.innerHTML = `
+                        <div class="card-number">${index + 1}</div>
+                        <div>
+                            <img src="${imageData}" class="img-preview" />
+                            <div class="img-name">${file.name}</div>
+                            <div style="font-size:0.7rem;color:#64748b;margin-top:4px;text-align:center;">
+                                ⚡ Question & options are in the image
+                            </div>
+                        </div>
+                        <div class="fields">
+                            <div style="background:#f0fdf4;border-radius:8px;padding:0.5rem 1rem;border:1px solid #dcfce7;margin-bottom:0.3rem;">
+                                <div style="font-weight:700;font-size:0.8rem;color:#16a34a;">
+                                    <i class="fas fa-info-circle"></i> Question and options are in the image above.
+                                </div>
+                                <div style="font-size:0.8rem;color:#64748b;">
+                                    <strong>A.</strong> Option A &nbsp; <strong>B.</strong> Option B &nbsp;
+                                    <strong>C.</strong> Option C &nbsp; <strong>D.</strong> Option D
+                                </div>
+                            </div>
+                            <div class="bottom-row">
+                                <div class="field-group">
+                                    <label>✅ Correct Answer <span style="color:#dc2626;">*</span></label>
+                                    <select id="iq_ans_${index}">
+                                        <option value="">Select</option>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                    </select>
+                                </div>
+                                <div class="field-group">
+                                    <label>💡 Explanation</label>
+                                    <input type="text" id="iq_exp_${index}" placeholder="Explanation (optional)" />
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Drag and Drop
+        const dropArea = document.getElementById('imageDropArea');
+        dropArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        dropArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+        dropArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('bulk_image_files').files = files;
+                document.getElementById('bulk_image_files').dispatchEvent(new Event('change'));
+            }
+        });
+
+        // ============================================
+        // ===== SUBMIT BULK IMAGE =====
+        // ============================================
+        document.getElementById('bulkImageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const section = document.getElementById('bulk_image_section').value;
+            const subject = parseInt(document.getElementById('bulk_image_subject').value);
+            const chapter = document.getElementById('bulk_image_chapter').value.trim();
+            const year = document.getElementById('bulk_image_year').value ? parseInt(document.getElementById('bulk_image_year').value) : null;
+            const timerMinutes = document.getElementById('bulk_timer_minutes').value || 200;
+
+            if (!section || !subject || !chapter) {
+                showError('Please select section, subject, and enter chapter/syllabus.');
+                return;
+            }
+
+            if (section === 'pyqs' && !year) {
+                showError('Year is required for PYQs.');
+                return;
+            }
+
+            const totalImages = imageQuestionsData.length;
+            if (totalImages === 0) {
+                showError('Please select at least one image.');
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append('section', section);
+            formData.append('subject', subject);
+            formData.append('chapter', chapter);
+            formData.append('year', year || '');
+            formData.append('difficulty', 'Medium');
+            formData.append('timer_minutes', timerMinutes);
+
+            let hasError = false;
+            for (let i = 0; i < totalImages; i++) {
+                const correct = document.getElementById(`iq_ans_${i}`)?.value;
+                const explanation = document.getElementById(`iq_exp_${i}`)?.value.trim();
+
+                if (!correct) {
+                    showError(`Please select correct answer for image ${i+1}`);
+                    hasError = true;
+                    break;
+                }
+
+                const fileInput = document.getElementById('bulk_image_files');
+                if (fileInput.files && fileInput.files[i]) {
+                    formData.append('images', fileInput.files[i]);
+                }
+
+                formData.append(`correct_${i}`, correct);
+                formData.append(`explanation_${i}`, explanation || '');
+            }
+
+            if (hasError) return;
+
+            const progressDiv = document.getElementById('bulkImageProgress');
+            progressDiv.classList.add('show');
+            document.getElementById('bulkImageProgressFill').style.width = '0%';
+            document.getElementById('bulkImageProgressText').textContent = 'Uploading... 0%';
+
+            const btn = document.getElementById('bulkImageSubmitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showError('Please login first');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/api/admin/bulk-image-questions`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                document.getElementById('bulkImageProgressFill').style.width = '100%';
+                document.getElementById('bulkImageProgressText').textContent =
+                    `✅ Complete! ${result.successCount} uploaded, ${result.errorCount} failed.`;
+
+                if (result.successCount > 0) {
+                    let msg = `✅ ${result.successCount} image questions uploaded successfully!`;
+                    if (result.testId) {
+                        msg += `\n📝 Test created with ID: ${result.testId}`;
+                        msg += `\n⏱️ Timer: ${timerMinutes} minutes (${Math.floor(timerMinutes/60)}h ${timerMinutes%60}m)`;
+                    }
+                    showSuccess(msg);
+                    loadQuestions();
+                    document.getElementById('imageQuestionContainer').innerHTML = `
+                        <p style="color:#94a3b8;text-align:center;padding:1rem;">
+                            <i class="fas fa-info-circle"></i> Select images above. For each image, only select the correct answer (A/B/C/D) and add explanation.
+                            <br><strong>Question and options are in the image!</strong>
+                        </p>
+                    `;
+                    document.getElementById('bulk_image_files').value = '';
+                    imageQuestionsData = [];
+                } else {
+                    showError('Failed to upload. ' + (result.errors || []).join(', '));
+                }
+            } catch (err) {
+                showError('Server error: ' + err.message);
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-upload"></i> Upload All Questions';
+            setTimeout(() => { progressDiv.classList.remove('show'); }, 5000);
+        });
+
+        // ============================================
+        // ===== LOAD QUESTIONS =====
+        // ============================================
+        async function loadQuestions() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const response = await fetch(`${API_BASE}/api/admin/questions`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        showError('Admin access required');
+                        return;
+                    }
+                    return;
+                }
+
+                const questions = await response.json();
+
+                const tbody = document.getElementById('questionList');
+                document.getElementById('questionCount').textContent = questions.length;
+
+                const testCount = questions.filter(q => q.section_type === 'testseries').length;
+                const practiceCount = questions.filter(q => q.section_type === 'practice').length;
+                const pyqCount = questions.filter(q => q.section_type === 'pyqs').length;
+                document.getElementById('testCount').textContent = testCount;
+                document.getElementById('practiceCount').textContent = practiceCount;
+                document.getElementById('pyqCount').textContent = pyqCount;
+
+                if (questions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;">No questions added yet.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = questions.map((q, i) => {
+                    const typeBadge = getTypeBadge(q.question_type);
+                    const sectionBadge = getSectionBadge(q.section_type);
+                    const imageDisplay = q.image_data ?
+                        `<img src="${q.image_data}" class="image-cell" />` : '-';
+                    const subjectBadge = q.subject_name ?
+                        `<span class="badge badge-${q.subject_name.toLowerCase()}">${q.subject_name}</span>` : '-';
+
+                    let questionDisplay = q.question_text || q.assertion || '';
+                    if (q.question_type === 'assertion_reason') {
+                        questionDisplay = 'A/R: ' + (q.assertion || '').substring(0, 30) + '...';
+                    } else if (q.question_type === 'statement') {
+                        questionDisplay = 'Stmt: ' + (q.statement_1 || '').substring(0, 30) + '...';
+                    } else if (q.question_type === 'image') {
+                        questionDisplay = '📷 ' + (q.question_text || 'Image Question').substring(0, 30) + '...';
+                    }
+
+                    return `<tr>
+                        <td>${i + 1}</td>
+                        <td>${sectionBadge}</td>
+                        <td>${subjectBadge}</td>
+                        <td>${q.chapter || '-'}</td>
+                        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${questionDisplay}</td>
+                        <td>${typeBadge}</td>
+                        <td>${q.year || '-'}</td>
+                        <td>${imageDisplay}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteQuestion(${q.id})"><i class="fas fa-trash"></i></button></td>
+                    </tr>`;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function getTypeBadge(type) {
+            switch(type) {
+                case 'assertion_reason': return '<span class="tag tag-ar">A/R</span>';
+                case 'statement': return '<span class="tag tag-statement">Stmt</span>';
+                case 'image': return '<span class="tag tag-image">Image</span>';
+                default: return '<span class="tag tag-normal">Normal</span>';
+            }
+        }
+
+        function getSectionBadge(section) {
+            switch(section) {
+                case 'testseries': return '<span class="tag" style="background:#dbeafe;color:#0ea5e9;">Test</span>';
+                case 'practice': return '<span class="tag" style="background:#fef3c7;color:#d97706;">Practice</span>';
+                case 'pyqs': return '<span class="tag" style="background:#ede9fe;color:#7c3aed;">PYQ</span>';
+                default: return '<span class="tag tag-normal">-</span>';
+            }
+        }
+
+        // ============================================
+        // ===== DELETE QUESTION =====
+        // ============================================
+        async function deleteQuestion(id) {
+            if (!confirm('Delete this question?')) return;
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showError('Please login first');
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/api/admin/questions/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showSuccess('Question deleted successfully!');
+                    loadQuestions();
+                } else {
+                    showError(result.error || 'Failed to delete question');
+                }
+            } catch (err) {
+                showError('Server error. Please try again.');
+            }
+        }
+
+        // ============================================
+        // ===== MESSAGES =====
+        // ============================================
+        function showSuccess(msg) {
+            document.getElementById('successText').textContent = msg;
+            document.getElementById('successMsg').classList.add('show');
+            setTimeout(() => document.getElementById('successMsg').classList.remove('show'), 5000);
+        }
+
+        function showError(msg) {
+            document.getElementById('errorText').textContent = msg;
+            document.getElementById('errorMsg').classList.add('show');
+            setTimeout(() => document.getElementById('errorMsg').classList.remove('show'), 3000);
+        }
+
+        // ============================================
+        // ===== LOGOUT =====
+        // ============================================
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // ============================================
+        // ===== LOAD ON PAGE LOAD =====
+        // ============================================
+        loadQuestions();
+        console.log('🩺 PrepDOC Admin Panel Loaded!');
+        console.log('📡 API Base:', API_BASE);
+        console.log('💡 Make sure backend is running on port 5000');
+        console.log('⏱️ Default Timer: 3h 20m (200 minutes) for Weekly & Full Syllabus');
+        console.log('📅 Weekly Test: 4 sections with chapter selection');
+        console.log('📚 Full Syllabus: No syllabus section');
+    </script>
+</body>
+</html>

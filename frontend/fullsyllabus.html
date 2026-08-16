@@ -1,0 +1,297 @@
+
+     <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrepDOC - Full Syllabus Tests</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f7ff; color: #1a1a2e; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+        
+        .navbar {
+            background: #ffffff;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        
+        .logo { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .logo i { color: #0ea5e9; font-size: 1.8rem; }
+        .logo span { color: #0ea5e9; }
+        .logo .doc { background: #0ea5e9; color: white; padding: 2px 10px; border-radius: 30px; font-size: 0.7rem; margin-left: 4px; }
+        
+        .nav-links { display: flex; gap: 1.8rem; font-weight: 600; font-size: 0.95rem; align-items: center; transition: all 0.3s ease; }
+        .nav-links a { color: #64748b; text-decoration: none; transition: color 0.2s; padding: 0.5rem 0; }
+        .nav-links a:hover, .nav-links a.active { color: #0ea5e9; }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+            background: none;
+            border: none;
+        }
+        .hamburger span { display: block; width: 28px; height: 3px; background: #1a1a2e; border-radius: 3px; transition: all 0.3s ease; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+        
+        .page-header {
+            background: linear-gradient(135deg, #dcfce7, #86efac);
+            padding: 2.5rem 0 2rem;
+            text-align: center;
+            border-bottom: 3px solid #22c55e;
+        }
+        .page-header h1 { font-size: 2.5rem; font-weight: 800; color: #15803d; }
+        .page-header p { color: #166534; font-size: 1.1rem; margin-top: 0.3rem; }
+        .page-header .back-home { display: inline-block; margin-top: 1rem; color: #15803d; font-weight: 600; text-decoration: none; }
+        .page-header .back-home:hover { text-decoration: underline; }
+        
+        .section { padding: 2.5rem 0; }
+        .section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: #16a34a; }
+        
+        /* ===== FULL SYLLABUS CARDS - FIXED BORDER ===== */
+        .full-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+        .full-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 1.5rem;
+            border: 3px solid #86efac;  /* ✅ Always visible border */
+            transition: all 0.3s ease;
+            outline: none;  /* ✅ Remove default outline */
+        }
+        .full-card:focus { outline: none; }
+        .full-card:hover {
+            border-color: #16a34a;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(22, 163, 74, 0.10);
+        }
+        .full-card .full-badge {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 50px;
+            background: #dcfce7;
+            color: #16a34a;
+            margin-bottom: 0.5rem;
+        }
+        .full-card h4 { font-size: 1.05rem; font-weight: 700; }
+        .full-card .full-meta { display: flex; gap: 1rem; font-size: 0.8rem; color: #64748b; margin: 0.3rem 0 0.5rem; }
+        .full-card .full-meta i { margin-right: 4px; }
+        .full-card .desc { font-size: 0.85rem; color: #64748b; }
+        .full-card .card-footer { margin-top: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
+        .full-card .free-tag { color: #16a34a; font-weight: 700; }
+        
+        .btn { display: inline-block; padding: 0.4rem 1.2rem; border-radius: 50px; font-weight: 600; font-size: 0.8rem; border: none; cursor: pointer; background: #16a34a; color: #fff; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 12px rgba(22,163,74,0.3); outline: none; }
+        .btn:focus { outline: none; }
+        .btn:hover { background: #15803d; transform: scale(1.02); }
+        
+        .footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .footer .container { display: flex; flex-direction: column; gap: 0.8rem; }
+        .footer-links { display: flex; gap: 1.8rem; justify-content: center; flex-wrap: wrap; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
+        .footer-links a:hover { color: #fff; }
+        .footer-copy { font-size: 0.8rem; color: #64748b; }
+        .footer .brand { color: #0ea5e9; font-weight: 700; }
+        
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+                border-top: 1px solid #eef2ff;
+                margin-top: 0.8rem;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links a { padding: 0.8rem 0; width: 100%; text-align: center; border-bottom: 1px solid #f1f5f9; }
+            .nav-links a:last-child { border-bottom: none; }
+            
+            .page-header h1 { font-size: 1.8rem; }
+            .full-grid { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 480px) {
+            .page-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i> Prep<span>DOC</span>
+                <span class="doc">NEET</span>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="chapterwise.html">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html" class="active">Full Syllabus</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>🏆 Full Syllabus Test Series</h1>
+            <p>Complete mock tests with full NEET syllabus</p>
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <i class="fas fa-trophy"></i> Full Mock Tests
+                <span class="tag" style="font-size:0.7rem;background:#dcfce7;color:#16a34a;padding:2px 14px;border-radius:50px;font-weight:600;margin-left:auto;">6 Tests</span>
+            </div>
+
+            <div class="full-grid">
+                <div class="full-card">
+                    <span class="full-badge">Full Syllabus</span>
+                    <h4>NEET Mega Mock 2026</h4>
+                    <div class="full-meta">
+                        <span><i class="far fa-clock"></i> 3h 20m</span>
+                        <span><i class="far fa-question-circle"></i> 200 Qs</span>
+                    </div>
+                    <div class="desc">Complete NEET syllabus with detailed solutions.</div>
+                    <div class="card-footer">
+                        <span class="free-tag"><i class="fas fa-gift"></i> Free</span>
+                        <button class="btn" onclick="alert('Starting NEET Mega Mock 2026...')">Start Test</button>
+                    </div>
+                </div>
+
+                <div class="full-card">
+                    <span class="full-badge">Full Syllabus</span>
+                    <h4>NEET Grand Test 2025</h4>
+                    <div class="full-meta">
+                        <span><i class="far fa-clock"></i> 3h 20m</span>
+                        <span><i class="far fa-question-circle"></i> 200 Qs</span>
+                    </div>
+                    <div class="desc">Full length mock test with negative marking.</div>
+                    <div class="card-footer">
+                        <span class="free-tag"><i class="fas fa-gift"></i> Free</span>
+                        <button class="btn" onclick="alert('Starting NEET Grand Test 2025...')">Start Test</button>
+                    </div>
+                </div>
+
+                <div class="full-card">
+                    <span class="full-badge">Full Syllabus</span>
+                    <h4>NEET Advanced Mock</h4>
+                    <div class="full-meta">
+                        <span><i class="far fa-clock"></i> 3h 20m</span>
+                        <span><i class="far fa-question-circle"></i> 200 Qs</span>
+                    </div>
+                    <div class="desc">Advanced level questions for high scorers.</div>
+                    <div class="card-footer">
+                        <span class="free-tag"><i class="fas fa-gift"></i> Free</span>
+                        <button class="btn" onclick="alert('Starting NEET Advanced Mock...')">Start Test</button>
+                    </div>
+                </div>
+
+                <div class="full-card">
+                    <span class="full-badge">Biology Special</span>
+                    <h4>NEET Biology Special</h4>
+                    <div class="full-meta">
+                        <span><i class="far fa-clock"></i> 1h 30m</span>
+                        <span><i class="far fa-question-circle"></i> 100 Qs</span>
+                    </div>
+                    <div class="desc">Biology only full syllabus test.</div>
+                    <div class="card-footer">
+                        <span class="free-tag"><i class="fas fa-gift"></i> Free</span>
+                        <button class="btn" onclick="alert('Starting NEET Biology Special...')">Start Test</button>
+                    </div>
+                </div>
+
+                <div class="full-card">
+                    <span class="full-badge">Physics + Chemistry</span>
+                    <h4>NEET Physics + Chemistry</h4>
+                    <div class="full-meta">
+                        <span><i class="far fa-clock"></i> 2h</span>
+                        <span><i class="far fa-question-circle"></i> 120 Qs</span>
+                    </div>
+                    <div class="desc">Physics and Chemistry combined test.</div>
+                    <div class="card-footer">
+                        <span class="free-tag"><i class="fas fa-gift"></i> Free</span>
+                        <button class="btn" onclick="alert('Starting NEET Physics + Chemistry...')">Start Test</button>
+                    </div>
+                </div>
+
+                <div class="full-card">
+                    <span class="full-badge">Full Syllabus</span>
+                    <h4>NEET Complete Mock</h4>
+                    <div class="full-meta">
+                        <span><i class="far fa-clock"></i> 3h 20m</span>
+                        <span><i class="far fa-question-circle"></i> 200 Qs</span>
+                    </div>
+                    <div class="desc">Complete mock with all subjects.</div>
+                    <div class="card-footer">
+                        <span class="free-tag"><i class="fas fa-gift"></i> Free</span>
+                        <button class="btn" onclick="alert('Starting NEET Complete Mock...')">Start Test</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="chapterwise.html">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html">Full Syllabus</a>
+            </div>
+            <div class="footer-copy">
+                <span class="brand">🩺 PrepDOC</span> · Made for future doctors ❤️ · 100% Free
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+    </script>
+
+</body>
+</html>

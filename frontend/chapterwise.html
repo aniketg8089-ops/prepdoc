@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrepDOC - Chapterwise Tests</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f7ff; color: #1a1a2e; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+        
+        .navbar {
+            background: #ffffff;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        
+        .logo { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .logo i { color: #0ea5e9; font-size: 1.8rem; }
+        .logo span { color: #0ea5e9; }
+        .logo .doc { background: #0ea5e9; color: white; padding: 2px 10px; border-radius: 30px; font-size: 0.7rem; margin-left: 4px; }
+        
+        .nav-links { display: flex; gap: 1.8rem; font-weight: 600; font-size: 0.95rem; align-items: center; transition: all 0.3s ease; }
+        .nav-links a { color: #64748b; text-decoration: none; transition: color 0.2s; padding: 0.5rem 0; }
+        .nav-links a:hover, .nav-links a.active { color: #0ea5e9; }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+            background: none;
+            border: none;
+        }
+        .hamburger span { display: block; width: 28px; height: 3px; background: #1a1a2e; border-radius: 3px; transition: all 0.3s ease; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+        
+        .page-header {
+            background: linear-gradient(135deg, #ede9fe, #c4b5fd);
+            padding: 2.5rem 0 2rem;
+            text-align: center;
+            border-bottom: 3px solid #a78bfa;
+        }
+        .page-header h1 { font-size: 2.5rem; font-weight: 800; color: #5b21b6; }
+        .page-header p { color: #4c1d95; font-size: 1.1rem; margin-top: 0.3rem; }
+        .page-header .back-home {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #5b21b6;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .page-header .back-home:hover { text-decoration: underline; }
+        
+        .section { padding: 2.5rem 0; }
+        .section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: #7c3aed; }
+        
+        /* ===== SUBJECT BOXES ===== */
+        .subject-box-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .subject-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border: 3px solid #c4b5fd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            outline: none;
+        }
+        .subject-box:focus { outline: none; }
+        .subject-box:hover {
+            border-color: #7c3aed;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.12);
+        }
+        .subject-box .sub-icon { font-size: 3rem; margin-bottom: 0.5rem; display: block; }
+        .subject-box .sub-icon.bio { color: #16a34a; }
+        .subject-box .sub-icon.phy { color: #7c3aed; }
+        .subject-box .sub-icon.chem { color: #db2777; }
+        .subject-box h4 { font-size: 1.2rem; font-weight: 700; }
+        .subject-box .ch-count { font-size: 0.85rem; color: #64748b; }
+        .subject-box .arrow-link { display: inline-block; margin-top: 0.8rem; color: #7c3aed; font-weight: 600; }
+        
+        /* ===== CHAPTERS LIST ===== */
+        .chapters-list {
+            margin-top: 1.5rem;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 2px solid #eef2ff;
+        }
+        .chapters-list .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #7c3aed;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .chapters-list .back-btn:focus { outline: none; }
+        .chapters-list .back-btn:hover { color: #5b21b6; }
+        
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.8rem;
+        }
+        .chapter-item {
+            background: #fff;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #eef2ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            outline: none;
+        }
+        .chapter-item:focus { outline: none; }
+        .chapter-item:hover {
+            border-color: #7c3aed;
+            background: #f0f9ff;
+        }
+        .chapter-item .ch-name { font-size: 0.9rem; font-weight: 500; }
+        .chapter-item .ch-qs { font-size: 0.75rem; color: #64748b; background: #f1f5f9; padding: 2px 10px; border-radius: 50px; }
+        
+        .btn { display: inline-block; padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; background: #7c3aed; color: #fff; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 12px rgba(124,58,237,0.3); outline: none; }
+        .btn:focus { outline: none; }
+        .btn:hover { background: #6d28d9; transform: scale(1.02); }
+        .btn-sm { padding: 0.35rem 1.2rem; font-size: 0.8rem; }
+        
+        .footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        .footer .container { display: flex; flex-direction: column; gap: 0.8rem; }
+        .footer-links { display: flex; gap: 1.8rem; justify-content: center; flex-wrap: wrap; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
+        .footer-links a:hover { color: #fff; }
+        .footer-copy { font-size: 0.8rem; color: #64748b; }
+        .footer .brand { color: #0ea5e9; font-weight: 700; }
+        
+        .hidden { display: none; }
+        
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+                border-top: 1px solid #eef2ff;
+                margin-top: 0.8rem;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links a { padding: 0.8rem 0; width: 100%; text-align: center; border-bottom: 1px solid #f1f5f9; }
+            .nav-links a:last-child { border-bottom: none; }
+            
+            .subject-box-grid { grid-template-columns: 1fr 1fr; }
+            .page-header h1 { font-size: 1.8rem; }
+            .chapters-grid { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 480px) {
+            .subject-box-grid { grid-template-columns: 1fr; }
+            .page-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i> Prep<span>DOC</span>
+                <span class="doc">NEET</span>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="chapterwise.html" class="active">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html">Full Syllabus</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>📖 Chapterwise Test Series</h1>
+            <p>Select a subject to practice chapter by chapter</p>
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <i class="fas fa-book-open"></i> Choose Your Subject
+                <span class="tag" style="font-size:0.7rem;background:#ede9fe;color:#7c3aed;padding:2px 14px;border-radius:50px;font-weight:600;margin-left:auto;">All Chapters</span>
+            </div>
+
+            <div class="subject-box-grid" id="subjectGrid">
+                <a href="javascript:void(0)" class="subject-box" onclick="showChapters('physics')">
+                    <span class="sub-icon phy"><i class="fas fa-atom"></i></span>
+                    <h4>Physics</h4>
+                    <div class="ch-count">28 Chapters</div>
+                    <span class="arrow-link">View Chapters →</span>
+                </a>
+                <a href="javascript:void(0)" class="subject-box" onclick="showChapters('chemistry')">
+                    <span class="sub-icon chem"><i class="fas fa-flask"></i></span>
+                    <h4>Chemistry</h4>
+                    <div class="ch-count">26 Chapters</div>
+                    <span class="arrow-link">View Chapters →</span>
+                </a>
+                <a href="javascript:void(0)" class="subject-box" onclick="showChapters('biology')">
+                    <span class="sub-icon bio"><i class="fas fa-leaf"></i></span>
+                    <h4>Biology</h4>
+                    <div class="ch-count">29 Chapters</div>
+                    <span class="arrow-link">View Chapters →</span>
+                </a>
+            </div>
+
+            <!-- ===== PHYSICS CHAPTERS ===== -->
+            <div class="chapters-list hidden" id="physicsChapters">
+                <button class="back-btn" onclick="hideChapters('physics')">
+                    <i class="fas fa-arrow-left"></i> Back to Subjects
+                </button>
+                <h4 style="margin-bottom:0.8rem;color:#7c3aed;"><i class="fas fa-atom"></i> Physics Chapters</h4>
+                <div class="chapters-grid" id="physicsChapterList"></div>
+            </div>
+
+            <!-- ===== CHEMISTRY CHAPTERS ===== -->
+            <div class="chapters-list hidden" id="chemistryChapters">
+                <button class="back-btn" onclick="hideChapters('chemistry')">
+                    <i class="fas fa-arrow-left"></i> Back to Subjects
+                </button>
+                <h4 style="margin-bottom:0.8rem;color:#db2777;"><i class="fas fa-flask"></i> Chemistry Chapters</h4>
+                <div class="chapters-grid" id="chemistryChapterList"></div>
+            </div>
+
+            <!-- ===== BIOLOGY CHAPTERS ===== -->
+            <div class="chapters-list hidden" id="biologyChapters">
+                <button class="back-btn" onclick="hideChapters('biology')">
+                    <i class="fas fa-arrow-left"></i> Back to Subjects
+                </button>
+                <h4 style="margin-bottom:0.8rem;color:#16a34a;"><i class="fas fa-leaf"></i> Biology Chapters</h4>
+                <div class="chapters-grid" id="biologyChapterList"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="chapterwise.html">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html">Full Syllabus</a>
+            </div>
+            <div class="footer-copy">
+                <span class="brand">🩺 PrepDOC</span> · Made for future doctors ❤️ · 100% Free
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = 'https://prepdoc-api.onrender.com/api';
+
+        // ===== CHAPTER DATA =====
+        const chaptersData = {
+            physics: [
+                'Basic Mathematics', 'Units and Measurements', 'Motion in a Straight Line',
+                'Motion in a Plane', 'Laws of Motion', 'Work, Energy and Power',
+                'System of Particles', 'Rotation Motion', 'Gravitation',
+                'Mechanical Properties of Solid', 'Mechanical Properties of Fluids',
+                'Thermal Properties of Matter', 'Thermodynamics', 'Kinetic Theory of Gases',
+                'Oscillations', 'Waves', 'Electrostatic', 'Capacitance',
+                'Current Electricity', 'Moving Charges & Magnetism', 'Magnetism & Matter',
+                'EMI', 'Alternating Current', 'Electromagnetic Waves',
+                'Ray optics', 'Wave Optics', 'Dual Nature of Radiation and Matter',
+                'Atoms', 'Nuclei'
+            ],
+            chemistry: [
+                'Some Basic Concept of Chemistry', 'Structure of Atom',
+                'Classification of Elements & Periodicity', 'Chemical Bonding',
+                'Thermodynamics', 'Chemical Equilibrium', 'Ionic Equilibrium',
+                'Redox Reactions', 'p-Block Elements (Group 13 & 14)',
+                'Organic Chemistry: Some Basic Principles & Techniques',
+                'Hydrocarbons', 'Solutions', 'Electrochemistry', 'Chemical Kinetics',
+                'p-Block Elements (Group 15,16,17,18)', 'd & f-Block Elements',
+                'Coordination Compounds', 'Haloalkanes & Haloarenes',
+                'Alcohol, Phenol and Ether', 'Aldehyde and Ketone',
+                'Carboxylic Acid', 'Amines', 'Biomolecules', 'Practical Chemistry'
+            ],
+            biology: [
+                'Living World', 'Biological Classification', 'Plant Kingdom',
+                'Animal Kingdom', 'Morphology of Flowering Plants',
+                'Anatomy of Flowering Plants', 'Structural Organisation in Animals',
+                'Cell-The Unit of Life', 'Biomolecules', 'Cell Cycle and Cell Division',
+                'Photosynthesis in Higher Plants', 'Respiration in Plants',
+                'Plant Growth and Development', 'Breathing and Exchange of Gases',
+                'Body Fluids and Circulation', 'Excretory Products & their elimination',
+                'Locomotion and movements', 'Neural Control and Coordination',
+                'Chemical Coordination and Integration',
+                'Sexual Reproduction in Flowering Plants', 'Human Reproduction',
+                'Reproductive Health', 'Principles of Inheritance and Variation',
+                'Molecular Basis of Inheritance', 'Evolution', 'Human Health & Diseases',
+                'Microbes in human Welfare', 'Biotechnology- Principles and Processes',
+                'Biotechnology and Its Application'
+            ]
+        };
+
+        // ============================================
+        // ===== START CHAPTER TEST (FIXED) =====
+        // ============================================
+        async function startChapterTest(subject, chapter) {
+            const subjectMap = {
+                'physics': 1,
+                'chemistry': 2,
+                'biology': 3
+            };
+            
+            const subjectId = subjectMap[subject];
+            
+            try {
+                // Fetch questions for this chapter from Test Series
+                const url = `${API_BASE}/questions?subject_id=${subjectId}&chapter=${encodeURIComponent(chapter)}&section_type=testseries`;
+                console.log('📡 Fetching:', url);
+                
+                const response = await fetch(url);
+                const questions = await response.json();
+                
+                if (questions.length === 0) {
+                    alert(`📚 No test questions available for "${chapter}" yet.\n\nPlease add some questions from Admin Panel!`);
+                    return;
+                }
+                
+                // ✅ Store questions in sessionStorage for test.html
+                sessionStorage.setItem('chapterTestQuestions', JSON.stringify(questions));
+                sessionStorage.setItem('chapterTestName', chapter);
+                sessionStorage.setItem('chapterTestSubject', subject);
+                
+                // ✅ Redirect to test.html with type=chapter
+                window.location.href = `test.html?type=chapter&subject=${subject}&chapter=${encodeURIComponent(chapter)}`;
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Error loading questions. Please try again.');
+            }
+        }
+
+        // ============================================
+        // ===== SHOW CHAPTERS =====
+        // ============================================
+        function showChapters(subject) {
+            document.querySelectorAll('.chapters-list').forEach(el => el.classList.add('hidden'));
+            document.getElementById('subjectGrid').style.display = 'none';
+            
+            const target = document.getElementById(subject + 'Chapters');
+            target.classList.remove('hidden');
+            
+            const listId = subject + 'ChapterList';
+            const list = document.getElementById(listId);
+            if (list && list.children.length === 0) {
+                const chapters = chaptersData[subject] || [];
+                list.innerHTML = chapters.map((ch, i) => `
+                    <div class="chapter-item" onclick="startChapterTest('${subject}', '${ch}')">
+                        <span class="ch-name">${i+1}. ${ch}</span>
+                        <span class="ch-qs">📝 Test</span>
+                    </div>
+                `).join('');
+            }
+            
+            window.scrollTo({ top: document.querySelector('.section').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function hideChapters(subject) {
+            document.getElementById(subject + 'Chapters').classList.add('hidden');
+            document.getElementById('subjectGrid').style.display = 'grid';
+            window.scrollTo({ top: document.querySelector('.section').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        // ============================================
+        // ===== HAMBURGER MENU =====
+        // ============================================
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

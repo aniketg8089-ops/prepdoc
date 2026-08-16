@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrepDOC - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f7ff; color: #1a1a2e; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: #ffffff;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #eef2ff;
+        }
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* ===== LOGO ===== */
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a1a2e;
+        }
+        .logo i { color: #0ea5e9; font-size: 1.8rem; }
+        .logo span { color: #0ea5e9; }
+        .logo .doc {
+            background: #0ea5e9;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            margin-left: 4px;
+        }
+
+        /* ===== NAV LINKS ===== */
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .nav-links a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #0ea5e9;
+        }
+
+        /* ===== ADMIN LINK ===== */
+        .admin-link {
+            color: #7c3aed !important;
+            font-weight: 700 !important;
+            display: none;
+        }
+        .admin-link:hover {
+            color: #5b21b6 !important;
+        }
+        .admin-link i {
+            margin-right: 4px;
+        }
+
+        /* ===== AUTH BUTTONS (Desktop) ===== */
+        .auth-buttons {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+        .auth-buttons .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .auth-buttons .btn-outline {
+            background: transparent;
+            color: #0ea5e9;
+            border: 2px solid #0ea5e9;
+        }
+        .auth-buttons .btn-outline:hover {
+            background: #0ea5e9;
+            color: #fff;
+        }
+        .auth-buttons .btn-primary {
+            background: #0ea5e9;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(14,165,233,0.3);
+        }
+        .auth-buttons .btn-primary:hover {
+            background: #0284c7;
+            transform: scale(1.02);
+        }
+
+        /* ===== USER INFO (Logged In) ===== */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .user-info .user-name {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .user-info .btn-logout {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            background: #dc2626;
+            color: #fff;
+            transition: 0.2s;
+        }
+        .user-info .btn-logout:hover {
+            background: #b91c1c;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ===== HAMBURGER ===== */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+            background: none;
+            border: none;
+        }
+        .hamburger span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background: #1a1a2e;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -6px);
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            padding: 3rem 0 2.5rem;
+            text-align: center;
+            border-bottom: 3px solid #7dd3fc;
+        }
+        .hero .badge-hero {
+            display: inline-block;
+            background: #0ea5e9;
+            color: white;
+            padding: 4px 20px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 0.8rem;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #1a1a2e;
+        }
+        .hero h1 span { color: #0ea5e9; }
+        .hero p {
+            color: #1e293b;
+            font-size: 1.15rem;
+            margin-top: 0.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== SECTION ===== */
+        .section { padding: 2.5rem 0; }
+        .section-alt { background: #ffffff; }
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1a1a2e;
+        }
+        .section-title i { color: #0ea5e9; }
+        .section-title .tag {
+            font-size: 0.7rem;
+            background: #dbeafe;
+            color: #0ea5e9;
+            padding: 2px 14px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        /* ===== TEST CATEGORY CARDS ===== */
+        .test-category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .test-category-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border: 3px solid #dbeafe;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+            outline: none;
+        }
+        .test-category-card:focus { outline: none; }
+
+        .test-category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #0ea5e9;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        .test-category-card:hover::before { transform: scaleX(1); }
+        .test-category-card:hover {
+            transform: translateY(-6px);
+            border-color: #0ea5e9;
+            box-shadow: 0 12px 40px rgba(14, 165, 233, 0.15);
+        }
+
+        .test-category-card:nth-child(1) { border-color: #c4b5fd; }
+        .test-category-card:nth-child(1):hover { border-color: #7c3aed; }
+        .test-category-card:nth-child(2) { border-color: #f9a8d4; }
+        .test-category-card:nth-child(2):hover { border-color: #db2777; }
+        .test-category-card:nth-child(3) { border-color: #86efac; }
+        .test-category-card:nth-child(3):hover { border-color: #16a34a; }
+
+        .test-category-card .icon-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+        .test-category-card .icon-box.chapter { background: #ede9fe; color: #7c3aed; }
+        .test-category-card .icon-box.weekly { background: #fce7f3; color: #db2777; }
+        .test-category-card .icon-box.full { background: #dcfce7; color: #16a34a; }
+
+        .test-category-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .test-category-card p { color: #64748b; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .test-category-card .badge-count {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 14px;
+            border-radius: 50px;
+        }
+        .test-category-card .arrow {
+            display: inline-block;
+            margin-top: 0.8rem;
+            color: #0ea5e9;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* ===== PRACTICE SUBJECT BOXES ===== */
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .practice-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.8rem 1.2rem;
+            text-align: center;
+            border: 3px solid #fde68a;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            outline: none;
+        }
+        .practice-card:focus { outline: none; }
+        .practice-card:hover {
+            border-color: #f59e0b;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 35px rgba(245, 158, 11, 0.12);
+        }
+        .practice-card .sub-icon { font-size: 2.8rem; margin-bottom: 0.5rem; display: block; }
+        .practice-card .sub-icon.bio { color: #16a34a; }
+        .practice-card .sub-icon.phy { color: #7c3aed; }
+        .practice-card .sub-icon.chem { color: #db2777; }
+        .practice-card h4 { font-size: 1.2rem; font-weight: 700; }
+        .practice-card .ch-count { font-size: 0.85rem; color: #64748b; }
+        .practice-card .arrow-link {
+            display: inline-block;
+            margin-top: 0.6rem;
+            color: #d97706;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* ===== PYQ SINGLE BOX ===== */
+        .pyq-single-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .pyq-single-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 3px solid #c7d2fe;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            outline: none;
+        }
+        .pyq-single-card:focus { outline: none; }
+        .pyq-single-card:hover {
+            border-color: #6366f1;
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+        }
+        .pyq-single-card .icon-box {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #6366f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+        }
+        .pyq-single-card h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .pyq-single-card p { color: #64748b; font-size: 0.95rem; margin-bottom: 0.5rem; }
+        .pyq-single-card .badge-count {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4338ca;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 14px;
+            border-radius: 50px;
+        }
+        .pyq-single-card .arrow {
+            display: inline-block;
+            margin-top: 0.8rem;
+            color: #6366f1;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 1.5rem;
+            border-top: 1px solid #1e293b;
+        }
+        .footer .container { display: flex; flex-direction: column; gap: 0.8rem; }
+        .footer-links { display: flex; gap: 1.8rem; justify-content: center; flex-wrap: wrap; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .footer-links a:hover { color: #fff; }
+        .footer-copy { font-size: 0.8rem; color: #64748b; }
+        .footer .brand { color: #0ea5e9; font-weight: 700; }
+
+        /* ============================================ */
+        /* ===== RESPONSIVE - MOBILE MENU ===== */
+        /* ============================================ */
+
+        @media (max-width: 992px) {
+            .test-category-grid { grid-template-columns: repeat(2, 1fr); }
+            .practice-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+                border-top: 1px solid #eef2ff;
+                margin-top: 0.8rem;
+                order: 3;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links a {
+                padding: 0.8rem 0;
+                width: 100%;
+                text-align: center;
+                border-bottom: 1px solid #f1f5f9;
+            }
+            .nav-links a:last-child { border-bottom: none; }
+
+            /* Mobile Auth Buttons */
+            .auth-buttons {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0.6rem;
+                padding: 0.8rem 0;
+                border-top: 1px solid #eef2ff;
+                margin-top: 0.5rem;
+                order: 4;
+            }
+            .auth-buttons.mobile-show {
+                display: flex;
+            }
+            .auth-buttons .btn {
+                width: 100%;
+                text-align: center;
+                padding: 0.7rem;
+            }
+
+            /* Mobile User Info */
+            .user-info {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0.6rem;
+                padding: 0.8rem 0;
+                border-top: 1px solid #eef2ff;
+                margin-top: 0.5rem;
+                order: 4;
+            }
+            .user-info.mobile-show {
+                display: flex;
+            }
+            .user-info .btn-logout {
+                width: 100%;
+                text-align: center;
+                padding: 0.7rem;
+            }
+
+            /* Desktop auth hidden on mobile, shown in menu */
+            .navbar .container .auth-buttons:not(.mobile-show) {
+                display: none;
+            }
+            .navbar .container .user-info:not(.mobile-show) {
+                display: none;
+            }
+
+            .test-category-grid { grid-template-columns: 1fr; }
+            .practice-grid { grid-template-columns: 1fr 1fr; }
+            .hero h1 { font-size: 2rem; }
+            .pyq-single-grid { max-width: 100%; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 1.6rem; }
+            .section-title { font-size: 1.3rem; }
+            .logo { font-size: 1.3rem; }
+            .practice-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <header class="navbar">
+        <div class="container">
+            <!-- Logo -->
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i> Prep<span>DOC</span>
+                <span class="doc">NEET</span>
+            </div>
+
+            <!-- Right side: Auth + Hamburger -->
+            <div style="display:flex;align-items:center;gap:1rem;">
+                <!-- Auth Buttons (Desktop) -->
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn btn-outline">Login</a>
+                    <a href="signup.html" class="btn btn-primary">Sign Up</a>
+                </div>
+
+                <!-- User Info (Desktop - Logged In) -->
+                <div class="user-info hidden" id="userInfo">
+                    <span class="user-name" id="userName">👋 User</span>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+
+                <!-- Hamburger -->
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+
+            <!-- Nav Links -->
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html" class="active">Home</a>
+                <a href="chapterwise.html">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html">Full Syllabus</a>
+                <a href="practice.html">Practice</a>
+                <a href="pyqs.html">PYQs</a>
+                <a href="admin.html" class="admin-link" id="adminLink">
+                    <i class="fas fa-user-shield"></i> Admin
+                </a>
+                
+                <!-- Mobile Auth Buttons (inside menu) -->
+                <div class="auth-buttons mobile-auth" id="mobileAuthButtons" style="display:none;width:100%;flex-direction:column;gap:0.6rem;padding:0.8rem 0;border-top:1px solid #eef2ff;margin-top:0.5rem;">
+                    <a href="login.html" class="btn btn-outline" style="width:100%;text-align:center;padding:0.7rem;">Login</a>
+                    <a href="signup.html" class="btn btn-primary" style="width:100%;text-align:center;padding:0.7rem;">Sign Up</a>
+                </div>
+                
+                <!-- Mobile User Info (inside menu) -->
+                <div class="user-info mobile-user-info" id="mobileUserInfo" style="display:none;width:100%;flex-direction:column;gap:0.6rem;padding:0.8rem 0;border-top:1px solid #eef2ff;margin-top:0.5rem;">
+                    <span class="user-name" id="mobileUserName" style="text-align:center;font-weight:600;color:#1a1a2e;">👋 User</span>
+                    <button class="btn-logout" onclick="logout()" style="width:100%;text-align:center;padding:0.7rem;border-radius:50px;font-weight:600;font-size:0.85rem;border:none;cursor:pointer;background:#dc2626;color:#fff;">Logout</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="container">
+            <div class="badge-hero"><i class="fas fa-stethoscope"></i> Your Medical Journey Starts Here</div>
+            <h1>Welcome to <span>PrepDOC</span></h1>
+            <p>Chapterwise tests • Weekly tests • Full syllabus tests • Practice • PYQs — All free for future doctors!</p>
+        </div>
+    </section>
+
+    <!-- ===== TEST SERIES SECTION ===== -->
+    <section class="section" id="testsSection">
+        <div class="container">
+            <div class="section-title">
+                <i class="fas fa-pen-fancy"></i> Test Series
+                <span class="tag"><i class="fas fa-gift"></i> All Free</span>
+            </div>
+
+            <div class="test-category-grid">
+                <a href="chapterwise.html" class="test-category-card">
+                    <div class="icon-box chapter"><i class="fas fa-book"></i></div>
+                    <h3>📖 Chapterwise Test</h3>
+                    <p>Practice chapter by chapter with topic-wise questions</p>
+                    <span class="badge-count">29 Biology • 28 Physics • 26 Chemistry</span>
+                    <div class="arrow">Click to explore <i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <a href="weekly.html" class="test-category-card">
+                    <div class="icon-box weekly"><i class="fas fa-calendar-week"></i></div>
+                    <h3>📅 Weekly Test Series</h3>
+                    <p>New test every week to track your progress</p>
+                    <span class="badge-count">12 Tests Available</span>
+                    <div class="arrow">Click to explore <i class="fas fa-arrow-right"></i></div>
+                </a>
+
+                <a href="fullsyllabus.html" class="test-category-card">
+                    <div class="icon-box full"><i class="fas fa-trophy"></i></div>
+                    <h3>🏆 Full Syllabus Test</h3>
+                    <p>Complete mock tests with full NEET syllabus</p>
+                    <span class="badge-count">6 Full Tests</span>
+                    <div class="arrow">Click to explore <i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PRACTICE SECTION ===== -->
+    <section class="section section-alt" id="practiceSection">
+        <div class="container">
+            <div class="section-title">
+                <i class="fas fa-book-open"></i> Practice by Subject
+                <span class="tag">Chapterwise Practice</span>
+            </div>
+
+            <div class="practice-grid">
+                <a href="practice.html?subject=physics" class="practice-card">
+                    <span class="sub-icon phy"><i class="fas fa-atom"></i></span>
+                    <h4>Physics Practice</h4>
+                    <div class="ch-count">28 Chapters • 3,120 Questions</div>
+                    <span class="arrow-link">Start Practicing →</span>
+                </a>
+                <a href="practice.html?subject=chemistry" class="practice-card">
+                    <span class="sub-icon chem"><i class="fas fa-flask"></i></span>
+                    <h4>Chemistry Practice</h4>
+                    <div class="ch-count">26 Chapters • 2,980 Questions</div>
+                    <span class="arrow-link">Start Practicing →</span>
+                </a>
+                <a href="practice.html?subject=biology" class="practice-card">
+                    <span class="sub-icon bio"><i class="fas fa-leaf"></i></span>
+                    <h4>Biology Practice</h4>
+                    <div class="ch-count">29 Chapters • 4,520 Questions</div>
+                    <span class="arrow-link">Start Practicing →</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PYQ SECTION ===== -->
+    <section class="section" id="pyqsSection">
+        <div class="container">
+            <div class="section-title">
+                <i class="fas fa-history"></i> Previous Year Questions (PYQs)
+                <span class="tag">Real Exam</span>
+            </div>
+
+            <div class="pyq-single-grid">
+                <a href="pyqs.html" class="pyq-single-card">
+                    <div class="icon-box"><i class="fas fa-scroll"></i></div>
+                    <h3>📜 Chapterwise PYQs</h3>
+                    <p>Solve previous year questions chapter by chapter</p>
+                    <span class="badge-count">Physics • Chemistry • Biology</span>
+                    <div class="arrow">Click to explore <i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="chapterwise.html">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html">Full Syllabus</a>
+                <a href="practice.html">Practice</a>
+                <a href="pyqs.html">PYQs</a>
+                <a href="admin.html" class="admin-link" style="color:#94a3b8 !important;">Admin</a>
+            </div>
+            <div class="footer-copy">
+                <span class="brand">🩺 PrepDOC</span> · Made for future doctors ❤️ · 100% Free
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // ===== HAMBURGER MENU =====
+        // ============================================
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', function() {
+            this.classList.toggle('active');
+            navLinks.classList.toggle('active');
+
+            const mobileAuth = document.getElementById('mobileAuthButtons');
+            const mobileUser = document.getElementById('mobileUserInfo');
+
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+            if (navLinks.classList.contains('active')) {
+                if (token && user) {
+                    mobileUser.style.display = 'flex';
+                    mobileAuth.style.display = 'none';
+                    document.getElementById('mobileUserName').textContent = '👋 ' + user.name;
+                } else {
+                    mobileAuth.style.display = 'flex';
+                    mobileUser.style.display = 'none';
+                }
+            } else {
+                mobileAuth.style.display = 'none';
+                mobileUser.style.display = 'none';
+            }
+        });
+
+        // Close menu on link click
+        document.querySelectorAll('.nav-links a:not(.mobile-auth a):not(.mobile-user-info a)').forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.getElementById('mobileAuthButtons').style.display = 'none';
+                document.getElementById('mobileUserInfo').style.display = 'none';
+            });
+        });
+
+        // ============================================
+        // ===== AUTH CHECK =====
+        // ============================================
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+            const authButtons = document.getElementById('authButtons');
+            const userInfo = document.getElementById('userInfo');
+            const userName = document.getElementById('userName');
+            const adminLink = document.getElementById('adminLink');
+
+            if (token && user) {
+                authButtons.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                userName.textContent = '👋 ' + user.name;
+
+                // ✅ Show admin link if user is admin
+                if (user.isAdmin) {
+                    adminLink.style.display = 'inline-block';
+                } else {
+                    adminLink.style.display = 'none';
+                }
+            } else {
+                authButtons.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                adminLink.style.display = 'none';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+
+        // ============================================
+        // ===== LOAD =====
+        // ============================================
+        checkAuth();
+    </script>
+
+</body>
+</html>

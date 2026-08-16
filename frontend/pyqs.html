@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrepDOC - PYQs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== SAME AS PRACTICE BUT WITH PURPLE THEME ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f7ff; color: #1a1a2e; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1.2rem; }
+
+        .navbar {
+            background: #ffffff;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #eef2ff;
+        }
+        .navbar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+
+        .logo { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: #1a1a2e; }
+        .logo i { color: #0ea5e9; font-size: 1.8rem; }
+        .logo span { color: #0ea5e9; }
+        .logo .doc { background: #0ea5e9; color: white; padding: 2px 10px; border-radius: 30px; font-size: 0.7rem; margin-left: 4px; }
+
+        .nav-links { display: flex; gap: 1.8rem; font-weight: 600; font-size: 0.95rem; align-items: center; transition: all 0.3s ease; }
+        .nav-links a { color: #64748b; text-decoration: none; transition: color 0.2s; padding: 0.5rem 0; }
+        .nav-links a:hover, .nav-links a.active { color: #0ea5e9; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 5px;
+            background: none;
+            border: none;
+        }
+        .hamburger span { display: block; width: 28px; height: 3px; background: #1a1a2e; border-radius: 3px; transition: all 0.3s ease; }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+
+        .page-header {
+            background: linear-gradient(135deg, #ede9fe, #c4b5fd);
+            padding: 2rem 0 1.5rem;
+            text-align: center;
+            border-bottom: 3px solid #a78bfa;
+        }
+        .page-header h1 { font-size: 2rem; font-weight: 800; color: #5b21b6; }
+        .page-header p { color: #4c1d95; font-size: 1rem; margin-top: 0.2rem; }
+        .page-header .back-home { display: inline-block; margin-top: 0.8rem; color: #7c3aed; font-weight: 600; text-decoration: none; }
+        .page-header .back-home:hover { text-decoration: underline; }
+
+        .section { padding: 2rem 0; }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .subject-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border: 2.5px solid #94a3b8;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .subject-box:hover {
+            border-color: #7c3aed;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(124,58,237,0.1);
+        }
+        .subject-box .icon { font-size: 2.8rem; display: block; margin-bottom: 0.5rem; }
+        .subject-box .icon.bio { color: #16a34a; }
+        .subject-box .icon.phy { color: #7c3aed; }
+        .subject-box .icon.chem { color: #db2777; }
+        .subject-box h4 { font-size: 1.2rem; font-weight: 700; }
+        .subject-box .count { font-size: 0.85rem; color: #64748b; }
+
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        .chapter-item {
+            background: #fff;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            border: 2.5px solid #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .chapter-item:hover {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+        }
+        .chapter-item .ch-name { font-size: 0.9rem; font-weight: 500; }
+        .chapter-item .ch-qs { font-size: 0.75rem; background: #e2e8f0; padding: 2px 10px; border-radius: 50px; color: #475569; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #7c3aed;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        .back-btn:hover { color: #5b21b6; }
+        .hidden { display: none; }
+
+        .cbt-container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 1rem 0;
+        }
+
+        .cbt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 2.5px solid #94a3b8;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .cbt-header .title { font-weight: 700; font-size: 1.1rem; }
+        .cbt-header .info { font-size: 0.85rem; color: #64748b; }
+        .cbt-header .info span { background: #eef2ff; padding: 2px 10px; border-radius: 50px; margin: 0 4px; }
+
+        .cbt-question-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 2.5px solid #94a3b8;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .cbt-question-card .q-number {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .cbt-question-card .q-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .cbt-question-card .q-text .q-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            background: #ede9fe;
+            color: #7c3aed;
+            padding: 2px 12px;
+            border-radius: 50px;
+            margin-right: 0.5rem;
+        }
+        .cbt-question-card .q-text .q-year {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            background: #fef3c7;
+            color: #d97706;
+            padding: 2px 12px;
+            border-radius: 50px;
+            margin-right: 0.5rem;
+        }
+        .q-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            padding: 4px;
+            margin: 0.8rem 0;
+            display: block;
+        }
+
+        .cbt-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+        @media (max-width: 600px) {
+            .cbt-options { grid-template-columns: 1fr; }
+        }
+
+        .cbt-option {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            background: #fafbfc;
+        }
+        .cbt-option:hover {
+            border-color: #64748b;
+            background: #f1f5f9;
+        }
+        .cbt-option .opt-label {
+            font-weight: 700;
+            color: #64748b;
+            min-width: 24px;
+        }
+        .cbt-option.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+        }
+        .cbt-option.correct {
+            border-color: #16a34a !important;
+            background: #f0fdf4 !important;
+        }
+        .cbt-option.correct .opt-label { color: #16a34a; }
+        .cbt-option.wrong {
+            border-color: #dc2626 !important;
+            background: #fef2f2 !important;
+        }
+        .cbt-option.wrong .opt-label { color: #dc2626; }
+        .cbt-option.disabled { cursor: default; opacity: 0.8; }
+        .cbt-option .opt-icon { margin-left: auto; font-size: 1.1rem; }
+        .cbt-option.correct .opt-icon { color: #16a34a; }
+        .cbt-option.wrong .opt-icon { color: #dc2626; }
+
+        .cbt-explanation {
+            margin-top: 1.5rem;
+            padding: 1.2rem 1.5rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #7c3aed;
+            display: none;
+        }
+        .cbt-explanation.show { display: block; animation: fadeIn 0.4s ease; }
+        .cbt-explanation .exp-label { font-weight: 700; color: #7c3aed; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cbt-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .btn {
+            padding: 0.6rem 1.8rem;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .btn-primary { background: #7c3aed; color: #fff; }
+        .btn-primary:hover { background: #6d28d9; transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 2px solid #cbd5e1; color: #475569; }
+        .btn-outline:hover { border-color: #7c3aed; color: #7c3aed; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-success:hover { background: #15803d; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+
+        .cbt-progress {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        .cbt-progress .dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2.5px solid #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cbt-progress .dot:hover { border-color: #7c3aed; color: #7c3aed; }
+        .cbt-progress .dot.active { border-color: #7c3aed; background: #f5f3ff; color: #7c3aed; }
+        .cbt-progress .dot.answered { border-color: #7c3aed; background: #7c3aed; color: #fff; }
+        .cbt-progress .dot.correct-dot { border-color: #16a34a; background: #16a34a; color: #fff; }
+        .cbt-progress .dot.wrong-dot { border-color: #dc2626; background: #dc2626; color: #fff; }
+
+        .footer {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .footer .container { display: flex; flex-direction: column; gap: 0.5rem; }
+        .footer-links { display: flex; gap: 1.8rem; justify-content: center; flex-wrap: wrap; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
+        .footer-links a:hover { color: #fff; }
+        .footer-copy { font-size: 0.8rem; color: #64748b; }
+        .footer .brand { color: #0ea5e9; font-weight: 700; }
+
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0;
+                padding: 1rem 0;
+                border-top: 1px solid #eef2ff;
+                margin-top: 0.8rem;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links a { padding: 0.8rem 0; width: 100%; text-align: center; border-bottom: 1px solid #f1f5f9; }
+            .nav-links a:last-child { border-bottom: none; }
+            .subject-grid { grid-template-columns: 1fr 1fr; }
+            .cbt-options { grid-template-columns: 1fr; }
+            .cbt-header { flex-direction: column; text-align: center; }
+        }
+        @media (max-width: 480px) {
+            .subject-grid { grid-template-columns: 1fr; }
+            .page-header h1 { font-size: 1.5rem; }
+            .cbt-question-card { padding: 1.2rem; }
+            .cbt-nav .btn { padding: 0.5rem 1.2rem; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <div class="logo"><i class="fas fa-heartbeat"></i> Prep<span>DOC</span><span class="doc">NEET</span></div>
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <nav class="nav-links" id="navLinks">
+                <a href="index.html">Home</a>
+                <a href="chapterwise.html">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html">Full Syllabus</a>
+                <a href="practice.html">Practice</a>
+                <a href="pyqs.html" class="active">PYQs</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>📜 Chapterwise PYQs</h1>
+            <p id="subjectDisplay">Select a subject to solve previous year questions</p>
+            <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
+    </section>
+
+    <section class="section" id="mainSection">
+        <div class="container">
+            <div id="subjectGrid">
+                <div class="subject-grid">
+                    <div class="subject-box" onclick="showChapters('physics')">
+                        <span class="icon phy"><i class="fas fa-atom"></i></span>
+                        <h4>Physics PYQs</h4>
+                        <div class="count">28 Chapters</div>
+                    </div>
+                    <div class="subject-box" onclick="showChapters('chemistry')">
+                        <span class="icon chem"><i class="fas fa-flask"></i></span>
+                        <h4>Chemistry PYQs</h4>
+                        <div class="count">26 Chapters</div>
+                    </div>
+                    <div class="subject-box" onclick="showChapters('biology')">
+                        <span class="icon bio"><i class="fas fa-leaf"></i></span>
+                        <h4>Biology PYQs</h4>
+                        <div class="count">29 Chapters</div>
+                    </div>
+                </div>
+            </div>
+            <div id="chaptersContainer"></div>
+            <div id="cbtContainer" class="cbt-container" style="display:none;"></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="chapterwise.html">Chapterwise</a>
+                <a href="weekly.html">Weekly</a>
+                <a href="fullsyllabus.html">Full Syllabus</a>
+                <a href="practice.html">Practice</a>
+                <a href="pyqs.html">PYQs</a>
+            </div>
+            <div class="footer-copy"><span class="brand">🩺 PrepDOC</span> · Made for future doctors ❤️ · 100% Free</div>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = 'https://prepdoc-api.onrender.com/api';
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let answeredStatus = {};
+
+        const chaptersData = {
+            physics: ['Basic Mathematics','Units and Measurements','Motion in a Straight Line','Motion in a Plane','Laws of Motion','Work, Energy and Power','System of Particles','Rotation Motion','Gravitation','Mechanical Properties of Solid','Mechanical Properties of Fluids','Thermal Properties of Matter','Thermodynamics','Kinetic Theory of Gases','Oscillations','Waves','Electrostatic','Capacitance','Current Electricity','Moving Charges & Magnetism','Magnetism & Matter','EMI','Alternating Current','Electromagnetic Waves','Ray optics','Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei'],
+            chemistry: ['Some Basic Concept of Chemistry','Structure of Atom','Classification of Elements & Periodicity','Chemical Bonding','Thermodynamics','Chemical Equilibrium','Ionic Equilibrium','Redox Reactions','p-Block Elements (Group 13 & 14)','Organic Chemistry: Some Basic Principles & Techniques','Hydrocarbons','Solutions','Electrochemistry','Chemical Kinetics','p-Block Elements (Group 15,16,17,18)','d & f-Block Elements','Coordination Compounds','Haloalkanes & Haloarenes','Alcohol, Phenol and Ether','Aldehyde and Ketone','Carboxylic Acid','Amines','Biomolecules','Practical Chemistry'],
+            biology: ['Living World','Biological Classification','Plant Kingdom','Animal Kingdom','Morphology of Flowering Plants','Anatomy of Flowering Plants','Structural Organisation in Animals','Cell-The Unit of Life','Biomolecules','Cell Cycle and Cell Division','Photosynthesis in Higher Plants','Respiration in Plants','Plant Growth and Development','Breathing and Exchange of Gases','Body Fluids and Circulation','Excretory Products & their elimination','Locomotion and movements','Neural Control and Coordination','Chemical Coordination and Integration','Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health','Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution','Human Health & Diseases','Microbes in human Welfare','Biotechnology- Principles and Processes','Biotechnology and Its Application']
+        };
+
+        function showChapters(subject) {
+            document.getElementById('subjectGrid').style.display = 'none';
+            document.getElementById('cbtContainer').style.display = 'none';
+            const container = document.getElementById('chaptersContainer');
+            const chapters = chaptersData[subject] || [];
+            let html = `<div class="chapters-list" style="margin-top:1.5rem;background:#f8fafc;border-radius:16px;padding:1.5rem;border:2.5px solid #94a3b8;">
+                <button class="back-btn" onclick="backToSubjects()"><i class="fas fa-arrow-left"></i> Back to Subjects</button>
+                <h4 style="margin-bottom:0.8rem;color:#7c3aed;">${subject.charAt(0).toUpperCase()+subject.slice(1)} PYQ Chapters</h4>
+                <div class="chapters-grid">`;
+            chapters.forEach((ch, i) => {
+                html += `<div class="chapter-item" onclick="loadPYQs('${subject}','${ch}')">
+                    <span class="ch-name">${i+1}. ${ch}</span>
+                    <span class="ch-qs">📜 PYQs</span>
+                </div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+            container.style.display = 'block';
+            window.scrollTo({ top: document.querySelector('.section').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        function backToSubjects() {
+            document.getElementById('chaptersContainer').style.display = 'none';
+            document.getElementById('cbtContainer').style.display = 'none';
+            document.getElementById('subjectGrid').style.display = 'block';
+        }
+
+        async function loadPYQs(subject, chapter) {
+            const subjectMap = { physics: 1, chemistry: 2, biology: 3 };
+            const subjectId = subjectMap[subject];
+            try {
+                const url = `${API_BASE}/questions?subject_id=${subjectId}&chapter=${encodeURIComponent(chapter)}&section_type=pyqs`;
+                const response = await fetch(url);
+                const questions = await response.json();
+                if (questions.length === 0) {
+                    alert(`No PYQ questions for "${chapter}". Please add from Admin Panel.`);
+                    return;
+                }
+                currentQuestions = questions;
+                currentIndex = 0;
+                answeredStatus = {};
+                document.getElementById('chaptersContainer').style.display = 'none';
+                document.getElementById('cbtContainer').style.display = 'block';
+                renderPYQQuestion();
+                window.scrollTo({ top: document.querySelector('.section').offsetTop - 80, behavior: 'smooth' });
+            } catch (err) {
+                console.error(err);
+                alert('Error loading questions.');
+            }
+        }
+
+        function renderPYQQuestion() {
+            const container = document.getElementById('cbtContainer');
+            const q = currentQuestions[currentIndex];
+            if (!q) return;
+            const total = currentQuestions.length;
+            const labels = ['A', 'B', 'C', 'D'];
+            const options = [q.option_a, q.option_b, q.option_c, q.option_d];
+            let status = answeredStatus[q.id] || {};
+            let questionHtml = q.question_text || 'Question text not available';
+            let imageHtml = '';
+            if (q.image_data) {
+                imageHtml = `<img src="${q.image_data}" alt="Question Image" class="q-image" />`;
+            }
+            let html = `
+                <div class="cbt-header">
+                    <div class="title">📜 ${q.chapter || 'PYQs'}</div>
+                    <div class="info">Question <span>${currentIndex+1}</span> of <span>${total}</span></div>
+                </div>
+                <div class="cbt-progress">
+                    ${currentQuestions.map((_, i) => {
+                        let cls = 'dot';
+                        if (i === currentIndex) cls += ' active';
+                        const ans = answeredStatus[currentQuestions[i].id];
+                        if (ans && ans.selected) {
+                            cls += ' answered';
+                            if (ans.isCorrect) cls += ' correct-dot';
+                            else cls += ' wrong-dot';
+                        }
+                        return `<div class="${cls}" onclick="goToQuestion(${i})">${i+1}</div>`;
+                    }).join('')}
+                </div>
+                <div class="cbt-question-card">
+                    <div class="q-number">Question ${currentIndex+1} of ${total}</div>
+                    <div class="q-text">
+                        <span class="q-tag">PYQ</span>
+                        <span class="q-year">${q.year || 'N/A'}</span>
+                        <div style="margin-top: 0.5rem;">${questionHtml}</div>
+                        ${imageHtml}
+                    </div>
+                    <div class="cbt-options">
+                        ${labels.map((label, idx) => {
+                            let cls = 'cbt-option';
+                            const selected = status.selected === label;
+                            const isCorrect = q.correct_answer === label;
+                            if (selected) {
+                                cls += ' selected';
+                                if (status.answered) {
+                                    cls += isCorrect ? ' correct' : ' wrong';
+                                }
+                            }
+                            if (status.answered && isCorrect) { cls += ' correct'; }
+                            if (status.answered) { cls += ' disabled'; }
+                            const icon = (status.answered && isCorrect) ? '✅' :
+                                        (status.answered && selected && !isCorrect) ? '❌' : '';
+                            return `<div class="${cls}" onclick="selectPYQOption(${q.id}, '${label}')">
+                                <span class="opt-label">${label}</span>
+                                <span>${options[idx] || 'N/A'}</span>
+                                <span class="opt-icon">${icon}</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                    <div class="cbt-explanation ${status.answered ? 'show' : ''}">
+                        <div class="exp-label">💡 Explanation</div>
+                        <p style="margin-top:4px;">${q.explanation || 'No explanation available.'}</p>
+                    </div>
+                </div>
+                <div class="cbt-nav">
+                    <button class="btn btn-outline" onclick="prevPYQQuestion()" ${currentIndex===0?'disabled':''}>← Previous</button>
+                    <button class="btn btn-primary" onclick="nextPYQQuestion()">${currentIndex===total-1 ? 'Finish' : 'Next →'}</button>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function selectPYQOption(qId, label) {
+            const q = currentQuestions.find(x => x.id === qId);
+            if (!q) return;
+            if (answeredStatus[qId] && answeredStatus[qId].answered) return;
+            const isCorrect = q.correct_answer === label;
+            answeredStatus[qId] = { selected: label, isCorrect: isCorrect, answered: true };
+            renderPYQQuestion();
+        }
+
+        function goToQuestion(index) {
+            if (index >= 0 && index < currentQuestions.length) {
+                currentIndex = index;
+                renderPYQQuestion();
+            }
+        }
+
+        function nextPYQQuestion() {
+            if (currentIndex < currentQuestions.length - 1) {
+                currentIndex++;
+                renderPYQQuestion();
+            } else {
+                showPYQSummary();
+            }
+        }
+
+        function prevPYQQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderPYQQuestion();
+            }
+        }
+
+        function showPYQSummary() {
+            const total = currentQuestions.length;
+            let correct = 0, wrong = 0, unattempted = 0;
+            currentQuestions.forEach(q => {
+                const ans = answeredStatus[q.id];
+                if (!ans || !ans.answered) unattempted++;
+                else if (ans.isCorrect) correct++;
+                else wrong++;
+            });
+            const container = document.getElementById('cbtContainer');
+            container.innerHTML = `
+                <div style="background:#fff;border-radius:16px;padding:2.5rem;border:2.5px solid #94a3b8;text-align:center;">
+                    <h2 style="margin-bottom:0.5rem;">📊 PYQ Summary</h2>
+                    <p style="color:#64748b;margin-bottom:1.5rem;">${currentQuestions[0]?.chapter || 'PYQs'} - Completed!</p>
+                    <div style="display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+                        <div><div style="font-size:2.5rem;font-weight:800;color:#16a34a;">${correct}</div><div style="color:#64748b;">Correct</div></div>
+                        <div><div style="font-size:2.5rem;font-weight:800;color:#dc2626;">${wrong}</div><div style="color:#64748b;">Wrong</div></div>
+                        <div><div style="font-size:2.5rem;font-weight:800;color:#94a3b8;">${unattempted}</div><div style="color:#64748b;">Unattempted</div></div>
+                    </div>
+                    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="location.reload()">🔄 Practice Again</button>
+                        <button class="btn btn-outline" onclick="backToSubjects()">📚 Back to Subjects</button>
+                    </div>
+                </div>
+            `;
+            window.scrollTo({ top: document.querySelector('.section').offsetTop - 80, behavior: 'smooth' });
+        }
+
+        document.getElementById('hamburger').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.getElementById('navLinks').classList.toggle('active');
+        });
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('hamburger').classList.remove('active');
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

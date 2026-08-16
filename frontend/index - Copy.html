@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - PrepDOC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f7ff; color: #1a1a2e; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.2rem; }
+        
+        .admin-header {
+            background: #fff;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            border: 1px solid #eef2ff;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .admin-header h1 { font-size: 1.8rem; }
+        .admin-header h1 i { color: #0ea5e9; }
+        
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #eef2ff;
+            margin-bottom: 2rem;
+        }
+        .card h2 { margin-bottom: 1rem; font-size: 1.3rem; }
+        .card h2 i { color: #0ea5e9; }
+        
+        .section-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .section-tabs .tab-btn {
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            border: 2px solid #eef2ff;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-tabs .tab-btn:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        .section-tabs .tab-btn.active {
+            border-color: #0ea5e9;
+            background: #0ea5e9;
+            color: #fff;
+        }
+        .section-tabs .tab-btn .count {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+        }
+        .section-tabs .tab-btn.active .count {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .subject-box {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid #eef2ff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .subject-box:hover {
+            border-color: #0ea5e9;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        }
+        .subject-box.active {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        .subject-box .icon { font-size: 2.5rem; display: block; margin-bottom: 0.5rem; }
+        .subject-box .icon.bio { color: #16a34a; }
+        .subject-box .icon.phy { color: #7c3aed; }
+        .subject-box .icon.chem { color: #db2777; }
+        .subject-box h4 { font-weight: 700; font-size: 1.1rem; }
+        .subject-box .sub-count { font-size: 0.85rem; color: #64748b; }
+        
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        .chapter-item {
+            background: #fff;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #eef2ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .chapter-item:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        .chapter-item .ch-name { font-size: 0.9rem; font-weight: 500; }
+        .chapter-item .ch-qs { 
+            font-size: 0.75rem; 
+            background: #e2e8f0; 
+            padding: 2px 10px; 
+            border-radius: 50px;
+            color: #475569;
+        }
+        .chapter-item .ch-qs.has-qs { background: #dcfce7; color: #16a34a; }
+        .chapter-item .ch-qs.no-qs { background: #fee2e2; color: #dc2626; }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            color: #0ea5e9;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        .back-btn:hover { color: #0284c7; }
+        
+        .hidden { display: none; }
+        
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .form-group label .required { color: #dc2626; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 2px solid #eef2ff;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.7rem 2rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+        .btn-primary { background: #0ea5e9; color: #fff; }
+        .btn-primary:hover { background: #0284c7; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-success:hover { background: #15803d; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+        .btn-warning { background: #f59e0b; color: #fff; }
+        .btn-warning:hover { background: #d97706; }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            border: 2px solid #eef2ff;
+            display: none;
+        }
+        .image-preview.show { display: block; }
+        
+        .success-msg {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .success-msg.show { display: block; }
+        .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .error-msg.show { display: block; }
+        
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+        .tag-normal { background: #e2e8f0; color: #475569; }
+        .tag-ar { background: #ede9fe; color: #7c3aed; }
+        .tag-statement { background: #fce7f3; color: #db2777; }
+        .tag-image { background: #fef3c7; color: #d97706; }
+        .tag-db { background: #dcfce7; color: #16a34a; }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-physics { background: #ede9fe; color: #7c3aed; }
+        .badge-chemistry { background: #fce7f3; color: #db2777; }
+        .badge-biology { background: #dcfce7; color: #16a34a; }
+        
+        .table-responsive { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eef2ff;
+        }
+        th { background: #f8fafc; font-weight: 700; }
+        
+        .image-cell {
+            max-width: 60px;
+            max-height: 40px;
+            border-radius: 6px;
+        }
+        
+        .auto-notification {
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            display: none;
+            color: #15803d;
+            font-weight: 500;
+        }
+        .auto-notification.show {
+            display: block;
+        }
+        .auto-notification i {
+            color: #16a34a;
+            margin-right: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .subject-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-row-3 { grid-template-columns: 1fr; }
+            .section-tabs { flex-direction: column; }
+            .section-tabs .tab-btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-user-cog"></i> Admin Panel</h1>
+            <div>
+                <a href="index.html" class="btn btn-primary"><i class="fas fa-home"></i> Home</a>
+                <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="success-msg" id="successMsg"><i class="fas fa-check-circle"></i> <span id="successText"></span></div>
+        <div class="error-msg" id="errorMsg"><i class="fas fa-exclamation-circle"></i> <span id="errorText"></span></div>
+
+        <!-- Auto-Fill Notification -->
+        <div class="auto-notification" id="autoNotification">
+            <i class="fas fa-check-circle"></i>
+            <span id="autoNotificationText">Fields auto-filled from selection!</span>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== SECTION TABS ===== -->
+        <!-- ============================================ -->
+        <div class="section-tabs">
+            <button class="tab-btn active" onclick="switchTab('testseries')">
+                <i class="fas fa-pen-fancy"></i> Test Series
+                <span class="count" id="testCount">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('practice')">
+                <i class="fas fa-book-open"></i> Practice
+                <span class="count" id="practiceCount">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('pyqs')">
+                <i class="fas fa-history"></i> PYQs
+                <span class="count" id="pyqCount">0</span>
+            </button>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== TAB 1: TEST SERIES ===== -->
+        <!-- ============================================ -->
+        <div class="tab-content active" id="tab-testseries">
+            <div class="card">
+                <h2><i class="fas fa-pen-fancy"></i> Test Series Questions</h2>
+                <p style="color:#64748b;margin-bottom:1rem;">Select a test type to add questions</p>
+
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+                    <button class="btn btn-primary" onclick="showTestType('chapterwise')">
+                        <i class="fas fa-book"></i> Chapterwise
+                    </button>
+                    <button class="btn btn-warning" onclick="showTestType('weekly')">
+                        <i class="fas fa-calendar-week"></i> Weekly
+                    </button>
+                    <button class="btn btn-success" onclick="showTestType('fullsyllabus')">
+                        <i class="fas fa-trophy"></i> Full Syllabus
+                    </button>
+                </div>
+
+                <div id="testChapterwise" style="display:block;">
+                    <div class="subject-grid">
+                        <div class="subject-box" onclick="showTestChapters('physics', 'chapterwise')">
+                            <span class="icon phy"><i class="fas fa-atom"></i></span>
+                            <h4>Physics</h4>
+                            <div class="sub-count">28 Chapters</div>
+                        </div>
+                        <div class="subject-box" onclick="showTestChapters('chemistry', 'chapterwise')">
+                            <span class="icon chem"><i class="fas fa-flask"></i></span>
+                            <h4>Chemistry</h4>
+                            <div class="sub-count">26 Chapters</div>
+                        </div>
+                        <div class="subject-box" onclick="showTestChapters('biology', 'chapterwise')">
+                            <span class="icon bio"><i class="fas fa-leaf"></i></span>
+                            <h4>Biology</h4>
+                            <div class="sub-count">29 Chapters</div>
+                        </div>
+                    </div>
+                    <div id="testChaptersContainer"></div>
+                </div>
+
+                <div id="testWeekly" style="display:none;">
+                    <p style="color:#64748b;">Add questions for weekly tests</p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:1rem;">
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '1', 'Basic Physics', 'Weekly Test 1')">
+                            <span class="ch-name">📅 Week 1: Basic Physics</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '2', 'Organic Chemistry', 'Weekly Test 2')">
+                            <span class="ch-name">📅 Week 2: Organic Chemistry</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '3', 'Human Physiology', 'Weekly Test 3')">
+                            <span class="ch-name">📅 Week 3: Human Physiology</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '2', 'Inorganic Chemistry', 'Weekly Test 4')">
+                            <span class="ch-name">📅 Week 4: Inorganic Chemistry</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '3', 'Genetics & Evolution', 'Weekly Test 5')">
+                            <span class="ch-name">📅 Week 5: Genetics & Evolution</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '1', 'Modern Physics', 'Weekly Test 6')">
+                            <span class="ch-name">📅 Week 6: Modern Physics</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="testFullSyllabus" style="display:none;">
+                    <p style="color:#64748b;">Add questions for full syllabus tests</p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin-top:1rem;">
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '1', 'Full Syllabus', 'NEET Mega Mock 2026')">
+                            <span class="ch-name">🏆 NEET Mega Mock 2026</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '1', 'Full Syllabus', 'NEET Grand Test 2025')">
+                            <span class="ch-name">🏆 NEET Grand Test 2025</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '1', 'Full Syllabus', 'NEET Advanced Mock')">
+                            <span class="ch-name">🏆 NEET Advanced Mock</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '3', 'Full Syllabus', 'NEET Biology Special')">
+                            <span class="ch-name">🏆 NEET Biology Special</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '1', 'Full Syllabus', 'NEET Physics + Chemistry')">
+                            <span class="ch-name">🏆 NEET Physics + Chemistry</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                        <div class="chapter-item" onclick="autoFillForm('testseries', '1', 'Full Syllabus', 'NEET Complete Mock')">
+                            <span class="ch-name">🏆 NEET Complete Mock</span>
+                            <span class="ch-qs">Select</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== TAB 2: PRACTICE ===== -->
+        <!-- ============================================ -->
+        <div class="tab-content" id="tab-practice">
+            <div class="card">
+                <h2><i class="fas fa-book-open"></i> Practice Questions</h2>
+                <p style="color:#64748b;margin-bottom:1rem;">Select a subject to add practice questions chapterwise</p>
+
+                <div class="subject-grid">
+                    <div class="subject-box" onclick="showPracticeChapters('physics')">
+                        <span class="icon phy"><i class="fas fa-atom"></i></span>
+                        <h4>Physics Practice</h4>
+                        <div class="sub-count">28 Chapters • 3,120 Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPracticeChapters('chemistry')">
+                        <span class="icon chem"><i class="fas fa-flask"></i></span>
+                        <h4>Chemistry Practice</h4>
+                        <div class="sub-count">26 Chapters • 2,980 Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPracticeChapters('biology')">
+                        <span class="icon bio"><i class="fas fa-leaf"></i></span>
+                        <h4>Biology Practice</h4>
+                        <div class="sub-count">29 Chapters • 4,520 Qs</div>
+                    </div>
+                </div>
+
+                <div id="practiceChaptersContainer"></div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== TAB 3: PYQs ===== -->
+        <!-- ============================================ -->
+        <div class="tab-content" id="tab-pyqs">
+            <div class="card">
+                <h2><i class="fas fa-history"></i> PYQ Questions</h2>
+                <p style="color:#64748b;margin-bottom:1rem;">Select a subject to add PYQs chapterwise with year filter</p>
+
+                <div class="subject-grid">
+                    <div class="subject-box" onclick="showPYQChapters('physics')">
+                        <span class="icon phy"><i class="fas fa-atom"></i></span>
+                        <h4>Physics PYQs</h4>
+                        <div class="sub-count">28 Chapters • 500+ Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPYQChapters('chemistry')">
+                        <span class="icon chem"><i class="fas fa-flask"></i></span>
+                        <h4>Chemistry PYQs</h4>
+                        <div class="sub-count">26 Chapters • 450+ Qs</div>
+                    </div>
+                    <div class="subject-box" onclick="showPYQChapters('biology')">
+                        <span class="icon bio"><i class="fas fa-leaf"></i></span>
+                        <h4>Biology PYQs</h4>
+                        <div class="sub-count">29 Chapters • 600+ Qs</div>
+                    </div>
+                </div>
+
+                <div id="pyqChaptersContainer"></div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- ===== ADD QUESTION FORM ===== -->
+        <!-- ============================================ -->
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add Question</h2>
+            
+            <div class="auto-notification" id="autoFillNotification" style="display:none;background:#f0fdf4;border:2px solid #16a34a;border-radius:10px;padding:0.8rem 1rem;margin-bottom:1rem;color:#15803d;font-weight:500;">
+                <i class="fas fa-check-circle"></i>
+                <span id="autoFillText">Fields auto-filled from selection!</span>
+            </div>
+
+            <div class="question-type-selector" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+                <button class="btn btn-primary" onclick="selectQuestionType('normal')" id="typeNormal">Normal MCQ</button>
+                <button class="btn btn-warning" onclick="selectQuestionType('assertion_reason')" id="typeAR">Assertion-Reason</button>
+                <button class="btn btn-primary" onclick="selectQuestionType('statement')" id="typeStmt">Statement Type</button>
+                <button class="btn btn-success" onclick="selectQuestionType('image')" id="typeImage">Image Question</button>
+            </div>
+
+            <form id="questionForm">
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label>Section <span class="required">*</span></label>
+                        <select id="section_type" required>
+                            <option value="">Select Section</option>
+                            <option value="testseries">Test Series</option>
+                            <option value="practice">Practice</option>
+                            <option value="pyqs">PYQs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject <span class="required">*</span></label>
+                        <select id="subject_id" required>
+                            <option value="">Select Subject</option>
+                            <option value="1">Physics</option>
+                            <option value="2">Chemistry</option>
+                            <option value="3">Biology</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Chapter <span class="required">*</span></label>
+                        <input type="text" id="chapter" placeholder="e.g., Laws of Motion" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Year (for PYQs)</label>
+                        <input type="number" id="year" placeholder="2025" />
+                    </div>
+                    <div class="form-group">
+                        <label>Difficulty</label>
+                        <select id="difficulty">
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Normal Question -->
+                <div id="normalFields">
+                    <div class="form-group">
+                        <label>Question Text <span class="required">*</span></label>
+                        <textarea id="question_text" placeholder="Enter your question here..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Option A <span class="required">*</span></label>
+                            <input type="text" id="option_a" placeholder="Option A" />
+                        </div>
+                        <div class="form-group">
+                            <label>Option B <span class="required">*</span></label>
+                            <input type="text" id="option_b" placeholder="Option B" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Option C <span class="required">*</span></label>
+                            <input type="text" id="option_c" placeholder="Option C" />
+                        </div>
+                        <div class="form-group">
+                            <label>Option D <span class="required">*</span></label>
+                            <input type="text" id="option_d" placeholder="Option D" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Correct Answer <span class="required">*</span></label>
+                            <select id="correct_answer">
+                                <option value="">Select</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Explanation</label>
+                            <input type="text" id="explanation" placeholder="Explanation (optional)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assertion-Reason -->
+                <div id="arFields" style="display:none;">
+                    <div class="form-group">
+                        <label>Assertion <span class="required">*</span></label>
+                        <textarea id="assertion" placeholder="Enter assertion statement..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Reason <span class="required">*</span></label>
+                        <textarea id="reason" placeholder="Enter reason statement..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Correct Option <span class="required">*</span></label>
+                        <select id="ar_correct_answer" required>
+                            <option value="">Select</option>
+                            <option value="A">A - Both correct, Reason is correct explanation</option>
+                            <option value="B">B - Both correct, Reason is NOT correct explanation</option>
+                            <option value="C">C - Assertion correct, Reason incorrect</option>
+                            <option value="D">D - Assertion incorrect, Reason correct</option>
+                            <option value="E">E - Both incorrect</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Explanation</label>
+                        <input type="text" id="ar_explanation" placeholder="Explanation (optional)" />
+                    </div>
+                </div>
+
+                <!-- Statement Type -->
+                <div id="stmtFields" style="display:none;">
+                    <div class="form-group">
+                        <label>Statement I <span class="required">*</span></label>
+                        <textarea id="statement_1" placeholder="Enter Statement I..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Statement II <span class="required">*</span></label>
+                        <textarea id="statement_2" placeholder="Enter Statement II..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Correct Option <span class="required">*</span></label>
+                        <select id="st_correct_answer" required>
+                            <option value="">Select</option>
+                            <option value="A">A - Both statements are correct</option>
+                            <option value="B">B - Both statements are incorrect</option>
+                            <option value="C">C - Statement I correct, Statement II incorrect</option>
+                            <option value="D">D - Statement I incorrect, Statement II correct</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Explanation</label>
+                        <input type="text" id="st_explanation" placeholder="Explanation (optional)" />
+                    </div>
+                </div>
+
+                <!-- Image Question -->
+                <div id="imageFields" style="display:none;">
+                    <div class="form-group">
+                        <label>Question Text <span class="required">*</span></label>
+                        <textarea id="image_question_text" placeholder="Enter your question here..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Image (Stored in Database)</label>
+                        <input type="file" id="image" accept="image/*" />
+                        <img id="imagePreview" class="image-preview" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Option A <span class="required">*</span></label>
+                            <input type="text" id="image_option_a" placeholder="Option A" />
+                        </div>
+                        <div class="form-group">
+                            <label>Option B <span class="required">*</span></label>
+                            <input type="text" id="image_option_b" placeholder="Option B" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Option C <span class="required">*</span></label>
+                            <input type="text" id="image_option_c" placeholder="Option C" />
+                        </div>
+                        <div class="form-group">
+                            <label>Option D <span class="required">*</span></label>
+                            <input type="text" id="image_option_d" placeholder="Option D" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Correct Answer <span class="required">*</span></label>
+                            <select id="image_correct_answer">
+                                <option value="">Select</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Explanation</label>
+                            <input type="text" id="image_explanation" placeholder="Explanation (optional)" />
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add Question</button>
+            </form>
+        </div>
+
+        <!-- Question List -->
+        <div class="card">
+            <h2><i class="fas fa-list"></i> All Questions (<span id="questionCount">0</span>)</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Section</th>
+                            <th>Subject</th>
+                            <th>Chapter</th>
+                            <th>Question</th>
+                            <th>Type</th>
+                            <th>Year</th>
+                            <th>Image</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionList">
+                        <tr><td colspan="9" style="text-align:center;color:#94a3b8;">Loading questions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ===== API CONFIGURATION =====
+        // ============================================
+        const API_BASE = 'https://prepdoc-api.onrender.com';  // ✅ Without /api
+        let currentQuestionType = 'normal';
+
+        // ============================================
+        // ===== SECTION TABS =====
+        // ============================================
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============================================
+        // ===== AUTO-FILL FORM =====
+        // ============================================
+        function autoFillForm(section, subjectId, chapter, testName) {
+            const subjectNames = { '1': 'Physics', '2': 'Chemistry', '3': 'Biology' };
+            const sectionNames = { 'testseries': 'Test Series', 'practice': 'Practice', 'pyqs': 'PYQs' };
+            
+            document.getElementById('section_type').value = section;
+            document.getElementById('subject_id').value = subjectId;
+            document.getElementById('chapter').value = chapter;
+            
+            document.getElementById('section_type').classList.add('auto-filled');
+            document.getElementById('subject_id').classList.add('auto-filled');
+            document.getElementById('chapter').classList.add('auto-filled');
+            
+            const notification = document.getElementById('autoFillNotification');
+            const text = document.getElementById('autoFillText');
+            text.textContent = `✅ Auto-filled: ${sectionNames[section]} → ${subjectNames[subjectId]} → "${chapter}" ${testName ? ' (' + testName + ')' : ''}`;
+            notification.style.display = 'block';
+            
+            selectQuestionType('normal');
+            document.getElementById('questionForm').scrollIntoView({ behavior: 'smooth' });
+            
+            setTimeout(() => {
+                document.getElementById('section_type').classList.remove('auto-filled');
+                document.getElementById('subject_id').classList.remove('auto-filled');
+                document.getElementById('chapter').classList.remove('auto-filled');
+            }, 3000);
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        // ============================================
+        // ===== TEST SERIES FUNCTIONS =====
+        // ============================================
+        function showTestType(type) {
+            document.getElementById('testChapterwise').style.display = 'none';
+            document.getElementById('testWeekly').style.display = 'none';
+            document.getElementById('testFullSyllabus').style.display = 'none';
+            
+            if (type === 'chapterwise') document.getElementById('testChapterwise').style.display = 'block';
+            else if (type === 'weekly') document.getElementById('testWeekly').style.display = 'block';
+            else if (type === 'fullsyllabus') document.getElementById('testFullSyllabus').style.display = 'block';
+        }
+
+        const chaptersData = {
+            physics: [
+                'Basic Mathematics', 'Units and Measurements', 'Motion in a Straight Line',
+                'Motion in a Plane', 'Laws of Motion', 'Work, Energy and Power',
+                'System of Particles', 'Rotation Motion', 'Gravitation',
+                'Mechanical Properties of Solid', 'Mechanical Properties of Fluids',
+                'Thermal Properties of Matter', 'Thermodynamics', 'Kinetic Theory of Gases',
+                'Oscillations', 'Waves', 'Electrostatic', 'Capacitance',
+                'Current Electricity', 'Moving Charges & Magnetism', 'Magnetism & Matter',
+                'EMI', 'Alternating Current', 'Electromagnetic Waves',
+                'Ray optics', 'Wave Optics', 'Dual Nature of Radiation and Matter',
+                'Atoms', 'Nuclei'
+            ],
+            chemistry: [
+                'Some Basic Concept of Chemistry', 'Structure of Atom',
+                'Classification of Elements & Periodicity', 'Chemical Bonding',
+                'Thermodynamics', 'Chemical Equilibrium', 'Ionic Equilibrium',
+                'Redox Reactions', 'p-Block Elements (Group 13 & 14)',
+                'Organic Chemistry: Some Basic Principles & Techniques',
+                'Hydrocarbons', 'Solutions', 'Electrochemistry', 'Chemical Kinetics',
+                'p-Block Elements (Group 15,16,17,18)', 'd & f-Block Elements',
+                'Coordination Compounds', 'Haloalkanes & Haloarenes',
+                'Alcohol, Phenol and Ether', 'Aldehyde and Ketone',
+                'Carboxylic Acid', 'Amines', 'Biomolecules', 'Practical Chemistry'
+            ],
+            biology: [
+                'Living World', 'Biological Classification', 'Plant Kingdom',
+                'Animal Kingdom', 'Morphology of Flowering Plants',
+                'Anatomy of Flowering Plants', 'Structural Organisation in Animals',
+                'Cell-The Unit of Life', 'Biomolecules', 'Cell Cycle and Cell Division',
+                'Photosynthesis in Higher Plants', 'Respiration in Plants',
+                'Plant Growth and Development', 'Breathing and Exchange of Gases',
+                'Body Fluids and Circulation', 'Excretory Products & their elimination',
+                'Locomotion and movements', 'Neural Control and Coordination',
+                'Chemical Coordination and Integration',
+                'Sexual Reproduction in Flowering Plants', 'Human Reproduction',
+                'Reproductive Health', 'Principles of Inheritance and Variation',
+                'Molecular Basis of Inheritance', 'Evolution', 'Human Health & Diseases',
+                'Microbes in human Welfare', 'Biotechnology- Principles and Processes',
+                'Biotechnology and Its Application'
+            ]
+        };
+
+        function renderChapters(containerId, subject, section, yearFilter = null, sectionType = null) {
+            const container = document.getElementById(containerId);
+            const chapters = chaptersData[subject] || [];
+            
+            const subjectIds = { 'physics': '1', 'chemistry': '2', 'biology': '3' };
+            const sectionMap = { 'testseries': 'testseries', 'practice': 'practice', 'pyqs': 'pyqs' };
+            
+            const currentSection = sectionMap[sectionType] || 'testseries';
+            const subjectId = subjectIds[subject] || '1';
+            
+            let html = `<button class="back-btn" onclick="document.getElementById('${containerId}').innerHTML = ''">
+                <i class="fas fa-arrow-left"></i> Back to Subjects
+            </button>
+            <h4 style="margin-bottom:0.8rem;color:#0ea5e9;">${subject.charAt(0).toUpperCase() + subject.slice(1)} Chapters</h4>
+            <div class="chapters-grid">`;
+            
+            chapters.forEach((ch, i) => {
+                html += `
+                    <div class="chapter-item" onclick="autoFillForm('${currentSection}', '${subjectId}', '${ch}')">
+                        <span class="ch-name">${i+1}. ${ch}</span>
+                        <span class="ch-qs">${yearFilter ? 'PYQ '+yearFilter : 'Select'}</span>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function showTestChapters(subject, type) {
+            renderChapters('testChaptersContainer', subject, 'Test Series: ' + type, null, 'testseries');
+        }
+
+        function showPracticeChapters(subject) {
+            renderChapters('practiceChaptersContainer', subject, 'Practice', null, 'practice');
+        }
+
+        function showPYQChapters(subject) {
+            const year = prompt('Enter Year for PYQs (e.g., 2025):', '2025');
+            if (year) {
+                renderChapters('pyqChaptersContainer', subject, 'PYQs', year, 'pyqs');
+            }
+        }
+
+        // ============================================
+        // ===== QUESTION TYPE SELECTOR =====
+        // ============================================
+        function selectQuestionType(type) {
+            currentQuestionType = type;
+            
+            document.getElementById('normalFields').style.display = 'none';
+            document.getElementById('arFields').style.display = 'none';
+            document.getElementById('stmtFields').style.display = 'none';
+            document.getElementById('imageFields').style.display = 'none';
+            
+            if (type === 'normal') document.getElementById('normalFields').style.display = 'block';
+            else if (type === 'assertion_reason') document.getElementById('arFields').style.display = 'block';
+            else if (type === 'statement') document.getElementById('stmtFields').style.display = 'block';
+            else if (type === 'image') document.getElementById('imageFields').style.display = 'block';
+        }
+
+        // ============================================
+        // ===== IMAGE PREVIEW =====
+        // ============================================
+        document.getElementById('image').addEventListener('change', function(e) {
+            const preview = document.getElementById('imagePreview');
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    preview.src = ev.target.result;
+                    preview.classList.add('show');
+                };
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                preview.classList.remove('show');
+            }
+        });
+
+        // ============================================
+        // ===== CONVERT IMAGE TO BASE64 =====
+        // ============================================
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => reject(error);
+            });
+        }
+
+        // ============================================
+        // ===== ADD QUESTION =====
+        // ============================================
+        document.getElementById('questionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {};
+            const type = currentQuestionType;
+
+            formData.section_type = document.getElementById('section_type').value;
+            formData.subject_id = parseInt(document.getElementById('subject_id').value) || null;
+            formData.chapter = document.getElementById('chapter').value;
+            formData.year = parseInt(document.getElementById('year').value) || null;
+            formData.difficulty = document.getElementById('difficulty').value;
+            formData.question_type = type;
+
+            if (!formData.section_type || !formData.subject_id || !formData.chapter) {
+                showError('Please fill all required fields');
+                return;
+            }
+
+            const imageFile = document.getElementById('image').files[0];
+            if (imageFile) {
+                const base64 = await convertToBase64(imageFile);
+                formData.image_data = base64;
+            }
+
+            if (type === 'normal') {
+                formData.question_text = document.getElementById('question_text').value;
+                formData.option_a = document.getElementById('option_a').value;
+                formData.option_b = document.getElementById('option_b').value;
+                formData.option_c = document.getElementById('option_c').value;
+                formData.option_d = document.getElementById('option_d').value;
+                formData.correct_answer = document.getElementById('correct_answer').value;
+                formData.explanation = document.getElementById('explanation').value || null;
+            } else if (type === 'assertion_reason') {
+                formData.assertion = document.getElementById('assertion').value;
+                formData.reason = document.getElementById('reason').value;
+                formData.correct_answer = document.getElementById('ar_correct_answer').value;
+                formData.explanation = document.getElementById('ar_explanation').value || null;
+            } else if (type === 'statement') {
+                formData.statement_1 = document.getElementById('statement_1').value;
+                formData.statement_2 = document.getElementById('statement_2').value;
+                formData.correct_answer = document.getElementById('st_correct_answer').value;
+                formData.explanation = document.getElementById('st_explanation').value || null;
+            } else if (type === 'image') {
+                formData.question_text = document.getElementById('image_question_text').value;
+                formData.option_a = document.getElementById('image_option_a').value;
+                formData.option_b = document.getElementById('image_option_b').value;
+                formData.option_c = document.getElementById('image_option_c').value;
+                formData.option_d = document.getElementById('image_option_d').value;
+                formData.correct_answer = document.getElementById('image_correct_answer').value;
+                formData.explanation = document.getElementById('image_explanation').value || null;
+            }
+
+            console.log('📤 Sending data:', formData);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/questions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                console.log('📥 Response:', result);
+
+                if (response.ok) {
+                    showSuccess('Question added successfully!');
+                    this.reset();
+                    document.getElementById('imagePreview').classList.remove('show');
+                    document.getElementById('autoFillNotification').style.display = 'none';
+                    loadQuestions();
+                } else {
+                    showError(result.error || 'Failed to add question');
+                }
+            } catch (err) {
+                console.error('❌ Error:', err);
+                showError('Server error. Please try again.');
+            }
+        });
+
+        // ============================================
+        // ===== LOAD QUESTIONS =====
+        // ============================================
+        async function loadQuestions() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/questions`);
+                const questions = await response.json();
+
+                const tbody = document.getElementById('questionList');
+                document.getElementById('questionCount').textContent = questions.length;
+
+                const testCount = questions.filter(q => q.section_type === 'testseries').length;
+                const practiceCount = questions.filter(q => q.section_type === 'practice').length;
+                const pyqCount = questions.filter(q => q.section_type === 'pyqs').length;
+                document.getElementById('testCount').textContent = testCount;
+                document.getElementById('practiceCount').textContent = practiceCount;
+                document.getElementById('pyqCount').textContent = pyqCount;
+
+                if (questions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;">No questions added yet.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = questions.map((q, i) => {
+                    const typeBadge = getTypeBadge(q.question_type);
+                    const sectionBadge = getSectionBadge(q.section_type);
+                    const imageDisplay = q.image_data ? 
+                        `<img src="${q.image_data}" class="image-cell" />` : '-';
+                    const subjectBadge = q.subject_name ? 
+                        `<span class="badge badge-${q.subject_name.toLowerCase()}">${q.subject_name}</span>` : '-';
+                    
+                    let questionDisplay = q.question_text || q.assertion || '';
+                    if (q.question_type === 'assertion_reason') {
+                        questionDisplay = 'A/R: ' + (q.assertion || '').substring(0, 30) + '...';
+                    } else if (q.question_type === 'statement') {
+                        questionDisplay = 'Stmt: ' + (q.statement_1 || '').substring(0, 30) + '...';
+                    }
+                    
+                    return `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${sectionBadge}</td>
+                            <td>${subjectBadge}</td>
+                            <td>${q.chapter || '-'}</td>
+                            <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${questionDisplay}</td>
+                            <td>${typeBadge}</td>
+                            <td>${q.year || '-'}</td>
+                            <td>${imageDisplay}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${q.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('❌ Error loading questions:', err);
+            }
+        }
+
+        function getTypeBadge(type) {
+            switch(type) {
+                case 'assertion_reason': return '<span class="tag tag-ar">A/R</span>';
+                case 'statement': return '<span class="tag tag-statement">Stmt</span>';
+                case 'image': return '<span class="tag tag-image">Image</span>';
+                default: return '<span class="tag tag-normal">Normal</span>';
+            }
+        }
+
+        function getSectionBadge(section) {
+            switch(section) {
+                case 'testseries': return '<span class="tag" style="background:#dbeafe;color:#0ea5e9;">Test</span>';
+                case 'practice': return '<span class="tag" style="background:#fef3c7;color:#d97706;">Practice</span>';
+                case 'pyqs': return '<span class="tag" style="background:#ede9fe;color:#7c3aed;">PYQ</span>';
+                default: return '<span class="tag tag-normal">-</span>';
+            }
+        }
+
+        // ============================================
+        // ===== DELETE QUESTION =====
+        // ============================================
+        async function deleteQuestion(id) {
+            if (!confirm('Delete this question?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/questions/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Question deleted successfully!');
+                    loadQuestions();
+                } else {
+                    showError(result.error || 'Failed to delete question');
+                }
+            } catch (err) {
+                showError('Server error. Please try again.');
+            }
+        }
+
+        // ============================================
+        // ===== MESSAGES =====
+        // ============================================
+        function showSuccess(msg) {
+            document.getElementById('successText').textContent = msg;
+            document.getElementById('successMsg').classList.add('show');
+            setTimeout(() => document.getElementById('successMsg').classList.remove('show'), 3000);
+        }
+
+        function showError(msg) {
+            document.getElementById('errorText').textContent = msg;
+            document.getElementById('errorMsg').classList.add('show');
+            setTimeout(() => document.getElementById('errorMsg').classList.remove('show'), 3000);
+        }
+
+        // ============================================
+        // ===== LOGOUT =====
+        // ============================================
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // ============================================
+        // ===== LOAD ON PAGE LOAD =====
+        // ============================================
+        loadQuestions();
+        selectQuestionType('normal');
+
+        console.log('🩺 PrepDOC Admin Panel Loaded!');
+        console.log('📡 API Base:', API_BASE);
+        console.log('💡 Make sure backend is running on port 5000');
+    </script>
+</body>
+</html>
