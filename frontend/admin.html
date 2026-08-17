@@ -200,7 +200,6 @@
             display: inline;
         }
 
-        /* ===== WEEKLY SECTION BOXES ===== */
         .weekly-sections {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -260,7 +259,6 @@
             color: #16a34a;
         }
 
-        /* ===== CHAPTERS INSIDE WEEKLY SECTION ===== */
         .weekly-chapters-container {
             margin-top: 1rem;
             padding: 1rem;
@@ -781,7 +779,7 @@
                         </div>
                     </div>
 
-                    <!-- Week 2-8 (Simplified - same structure) -->
+                    <!-- Week 2 -->
                     <div id="week2" style="display:none;">
                         <div class="weekly-sections">
                             <div class="weekly-section-box" onclick="showWeeklyChapters('week2', 'physics', 'phy')">
@@ -813,7 +811,6 @@
                                 <div class="upload-status" id="week2_bio2_status">⏳ Select Chapter</div>
                             </div>
                         </div>
-                        <!-- Chapters containers for week 2-8 -->
                         <div class="weekly-chapters-container" id="week2_phy_chapters"><div class="chapters-grid"></div></div>
                         <div class="weekly-chapters-container" id="week2_chem_chapters"><div class="chapters-grid"></div></div>
                         <div class="weekly-chapters-container" id="week2_bio1_chapters"><div class="chapters-grid"></div></div>
@@ -1024,9 +1021,7 @@
             </form>
         </div>
 
-        <!-- ============================================ -->
-        <!-- ===== QUESTION LIST ===== -->
-        <!-- ============================================ -->
+        <!-- Question List -->
         <div class="card">
             <h2><i class="fas fa-list"></i> All Questions (<span id="questionCount">0</span>)</h2>
             <div class="table-responsive">
@@ -1042,9 +1037,7 @@
             </div>
         </div>
 
-        <!-- ============================================ -->
-        <!-- ===== USER MANAGEMENT ===== -->
-        <!-- ============================================ -->
+        <!-- User Management -->
         <div class="card">
             <h2><i class="fas fa-users"></i> Registered Users (<span id="userCount">0</span>)</h2>
             <p style="color:#64748b;margin-bottom:1rem;font-size:0.9rem;">
@@ -1680,9 +1673,17 @@
         // ===== LOAD QUESTIONS =====
         // ============================================
         async function loadQuestions() {
+            console.log('🔄 Loading questions...');
+            console.log('📡 API_BASE:', API_BASE);
+            console.log('🔑 Token:', localStorage.getItem('token') ? 'Present' : 'Missing');
+
             try {
                 const token = localStorage.getItem('token');
-                if (!token) return;
+                if (!token) {
+                    document.getElementById('questionList').innerHTML = 
+                        '<tr><td colspan="9" style="text-align:center;color:#dc2626;">Please login first</td></tr>';
+                    return;
+                }
 
                 const response = await fetch(`${API_BASE}/api/admin/questions`, {
                     headers: {
@@ -1690,15 +1691,18 @@
                     }
                 });
                 
-                if (!response.ok) {
-                    if (response.status === 403) {
-                        showError('Admin access required');
-                        return;
-                    }
+                if (response.status === 403) {
+                    document.getElementById('questionList').innerHTML = 
+                        '<tr><td colspan="9" style="text-align:center;color:#dc2626;">Admin access required</td></tr>';
                     return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const questions = await response.json();
+                console.log('📝 Total Questions:', questions.length);
 
                 const tbody = document.getElementById('questionList');
                 document.getElementById('questionCount').textContent = questions.length;
@@ -1745,7 +1749,9 @@
                     </tr>`;
                 }).join('');
             } catch (err) {
-                console.error(err);
+                console.error('❌ Error loading questions:', err);
+                document.getElementById('questionList').innerHTML = 
+                    `<tr><td colspan="9" style="text-align:center;color:#dc2626;">Error loading questions: ${err.message}</td></tr>`;
             }
         }
 
@@ -1801,6 +1807,7 @@
         // ===== LOAD USERS =====
         // ============================================
         async function loadUsers() {
+            console.log('🔄 Loading users...');
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
@@ -1826,6 +1833,8 @@
                 }
 
                 const users = await response.json();
+                console.log('👥 Total Users:', users.length);
+                
                 const tbody = document.getElementById('userList');
                 document.getElementById('userCount').textContent = users.length;
 
