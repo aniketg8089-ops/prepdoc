@@ -2,18 +2,18 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-// ✅ FIX: Rebuild SQLite3 for Linux (Render)
+// âœ… FIX: Rebuild SQLite3 for Linux (Render)
 try {
     require('sqlite3');
-    console.log('✅ SQLite3 loaded successfully');
+    console.log('âœ… SQLite3 loaded successfully');
 } catch (e) {
-    console.log('⚠️ SQLite3 error, rebuilding for Linux...');
+    console.log('âš ï¸ SQLite3 error, rebuilding for Linux...');
     const { execSync } = require('child_process');
     try {
         execSync('npm rebuild sqlite3', { stdio: 'inherit' });
-        console.log('✅ SQLite3 rebuilt successfully');
+        console.log('âœ… SQLite3 rebuilt successfully');
     } catch (rebuildErr) {
-        console.error('❌ Failed to rebuild SQLite3:', rebuildErr.message);
+        console.error('âŒ Failed to rebuild SQLite3:', rebuildErr.message);
     }
 }
 
@@ -49,7 +49,7 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.warn('⚠️ CORS blocked origin:', origin);
+      console.warn('âš ï¸ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -92,12 +92,12 @@ const dbPath = path.join(__dirname, 'prepdoc.db');
 
 // Check if database exists, if not, run init
 if (!fs.existsSync(dbPath)) {
-    console.log('📦 Database not found, initializing...');
+    console.log('ðŸ“¦ Database not found, initializing...');
     try {
         require('./init-db.js');
-        console.log('✅ Database initialized successfully!');
+        console.log('âœ… Database initialized successfully!');
     } catch (err) {
-        console.error('❌ Error initializing database:', err);
+        console.error('âŒ Error initializing database:', err);
     }
 }
 
@@ -117,9 +117,9 @@ if (fs.existsSync(frontendPath)) {
     app.get('/', (req, res) => {
         res.sendFile(path.join(frontendPath, 'index.html'));
     });
-    console.log('📁 Frontend served from:', frontendPath);
+    console.log('ðŸ“ Frontend served from:', frontendPath);
 } else {
-    console.log('⚠️ Frontend folder not found at:', frontendPath);
+    console.log('âš ï¸ Frontend folder not found at:', frontendPath);
     app.get('/', (req, res) => {
         res.json({ 
             message: 'PrepDOC API Server', 
@@ -392,8 +392,8 @@ app.post('/api/admin/bulk-image-questions',
         const imageFiles = req.files || [];
         const { section, subject, chapter, year, difficulty, timer_minutes } = req.body;
 
-        console.log(`📸 ${imageFiles.length} images uploaded to Cloudinary by admin`);
-        console.log(`⏱️ Timer: ${timer_minutes || 30} minutes`);
+        console.log(`ðŸ“¸ ${imageFiles.length} images uploaded to Cloudinary by admin`);
+        console.log(`â±ï¸ Timer: ${timer_minutes || 30} minutes`);
 
         if (imageFiles.length === 0) {
             return res.status(400).json({ error: 'At least one image is required' });
@@ -419,9 +419,9 @@ app.post('/api/admin/bulk-image-questions',
                     function(err) {
                         if (!err) {
                             testId = this.lastID;
-                            console.log(`✅ Test created with ID: ${testId}, Duration: ${duration}`);
+                            console.log(`âœ… Test created with ID: ${testId}, Duration: ${duration}`);
                         } else {
-                            console.error('❌ Error creating test:', err);
+                            console.error('âŒ Error creating test:', err);
                         }
                         resolve();
                     }
@@ -477,7 +477,7 @@ app.post('/api/admin/bulk-image-questions',
                         errors.push(`Row ${i+1}: ${err.message}`);
                     } else {
                         successCount++;
-                        console.log(`✅ Question ${i+1} added with Cloudinary image: ${imageUrl}`);
+                        console.log(`âœ… Question ${i+1} added with Cloudinary image: ${imageUrl}`);
                     }
                     resolve();
                 });
@@ -562,7 +562,7 @@ app.get('/api/health', (req, res) => {
 // ===== ERROR HANDLING =====
 // ============================================
 app.use((err, req, res, next) => {
-    console.error('❌ Error:', err);
+    console.error('âŒ Error:', err);
     res.status(500).json({ 
         error: err.message || 'Internal server error',
         success: false
@@ -573,19 +573,76 @@ app.use((err, req, res, next) => {
 // ===== START SERVER =====
 // ============================================
 
+
+// ============================================
+// ===== ADMIN - GET ALL USERS =====
+// ============================================
+app.get('/api/admin/users', authenticate, requireAdmin, (req, res) => {
+    db.all(
+        'SELECT id, name, email, is_admin, created_at FROM users ORDER BY id DESC',
+        (err, rows) => {
+            if (err) {
+                console.error('❌ Error fetching users:', err);
+                return res.status(500).json({ error: err.message });
+            }
+            res.json(rows);
+        }
+    );
+});
+
+// ============================================
+// ===== ADMIN - DELETE USER =====
+// ============================================
+app.delete('/api/admin/users/:id', authenticate, requireAdmin, (req, res) => {
+    const id = req.params.id;
+    
+    // Prevent deleting yourself
+    if (parseInt(id) === req.user.id) {
+        return res.status(400).json({ error: 'Cannot delete your own account' });
+    }
+    
+    db.run('DELETE FROM users WHERE id = ?', [id], function(err) {
+        if (err) {
+            console.error('❌ Error deleting user:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true, message: 'User deleted successfully!' });
+    });
+});
+
+// ============================================
+// ===== ADMIN - UPDATE USER ROLE =====
+// ============================================
+app.put('/api/admin/users/:id/role', authenticate, requireAdmin, (req, res) => {
+    const id = req.params.id;
+    const { is_admin } = req.body;
+    
+    // Prevent changing your own role
+    if (parseInt(id) === req.user.id) {
+        return res.status(400).json({ error: 'Cannot change your own role' });
+    }
+    
+    db.run('UPDATE users SET is_admin = ? WHERE id = ?', [is_admin, id], function(err) {
+        if (err) {
+            console.error('❌ Error updating user role:', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true, message: 'User role updated successfully!' });
+    });
+});
 app.listen(PORT, () => {
-    console.log(`🩺 PrepDOC Server running at http://localhost:${PORT}`);
-    console.log(`📚 API Endpoints:`);
-    console.log(`   🔐 Auth: POST /api/signup, POST /api/login`);
-    console.log(`   📝 Tests: GET /api/tests, GET /api/tests/:id`);
-    console.log(`   📚 Questions: GET /api/questions`);
-    console.log(`   🔧 Admin (Protected):`);
+    console.log(`ðŸ©º PrepDOC Server running at http://localhost:${PORT}`);
+    console.log(`ðŸ“š API Endpoints:`);
+    console.log(`   ðŸ” Auth: POST /api/signup, POST /api/login`);
+    console.log(`   ðŸ“ Tests: GET /api/tests, GET /api/tests/:id`);
+    console.log(`   ðŸ“š Questions: GET /api/questions`);
+    console.log(`   ðŸ”§ Admin (Protected):`);
     console.log(`      GET  /api/admin/questions`);
     console.log(`      POST /api/admin/bulk-image-questions`);
     console.log(`      DELETE /api/admin/questions/:id`);
-    console.log(`   📂 Subjects: GET /api/subjects`);
-    console.log(`   🏥 Health: GET /api/health`);
-    console.log(`📸 Cloudinary: ${cloudinary.config().cloud_name}`);
-    console.log(`👑 Admin: aniket808089@gmail.com`);
-    console.log(`🌍 CORS allowed origins:`, allowedOrigins);
+    console.log(`   ðŸ“‚ Subjects: GET /api/subjects`);
+    console.log(`   ðŸ¥ Health: GET /api/health`);
+    console.log(`ðŸ“¸ Cloudinary: ${cloudinary.config().cloud_name}`);
+    console.log(`ðŸ‘‘ Admin: aniket808089@gmail.com`);
+    console.log(`ðŸŒ CORS allowed origins:`, allowedOrigins);
 });
