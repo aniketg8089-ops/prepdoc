@@ -22,22 +22,20 @@
             padding: 1.5rem;
         }
 
-        /* ===== SIGNUP CONTAINER ===== */
         .signup-container {
             background: #ffffff;
             border-radius: 24px;
             padding: 2.5rem 2.8rem;
             max-width: 460px;
             width: 100%;
-            border: 3px solid #dbeafe;  /* ✅ Fixed Outline */
+            border: 3px solid #dbeafe;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06);
             transition: border-color 0.3s ease;
         }
         .signup-container:hover {
-            border-color: #0ea5e9;  /* ✅ Hover par border change */
+            border-color: #0ea5e9;
         }
 
-        /* ===== LOGO ===== */
         .logo {
             text-align: center;
             font-size: 2rem;
@@ -59,7 +57,6 @@
             margin-bottom: 1.8rem;
         }
 
-        /* ===== ERROR & SUCCESS MESSAGES ===== */
         .error {
             background: #fee2e2;
             color: #dc2626;
@@ -88,7 +85,6 @@
             display: block;
         }
 
-        /* ===== FORM ===== */
         .form-group {
             margin-bottom: 1.2rem;
         }
@@ -127,7 +123,6 @@
             background: #fef2f2;
         }
 
-        /* ===== PASSWORD TOGGLE ===== */
         .password-wrapper {
             position: relative;
         }
@@ -151,7 +146,6 @@
             color: #0ea5e9;
         }
 
-        /* ===== PASSWORD STRENGTH ===== */
         .password-strength {
             display: flex;
             gap: 6px;
@@ -180,7 +174,6 @@
             margin-top: 4px;
         }
 
-        /* ===== BUTTONS ===== */
         .btn {
             width: 100%;
             padding: 0.85rem;
@@ -208,7 +201,6 @@
             transform: none;
         }
 
-        /* ===== LINKS ===== */
         .login-link {
             text-align: center;
             margin-top: 1.2rem;
@@ -226,7 +218,6 @@
             text-decoration: underline;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 480px) {
             .signup-container {
                 padding: 2rem 1.5rem;
@@ -240,13 +231,11 @@
 <body>
 
     <div class="signup-container">
-        <!-- Logo -->
         <div class="logo">
             <i class="fas fa-heartbeat"></i> Prep<span>DOC</span>
         </div>
         <p class="subtitle">Create your free account and start preparing!</p>
 
-        <!-- Error & Success Messages -->
         <div class="error" id="errorMsg">
             <i class="fas fa-exclamation-circle"></i>
             <span id="errorText"></span>
@@ -256,7 +245,6 @@
             <span id="successText"></span>
         </div>
 
-        <!-- Signup Form -->
         <form id="signupForm">
             <div class="form-group">
                 <label>Full Name <span class="required">*</span></label>
@@ -276,7 +264,6 @@
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
-                <!-- Password Strength -->
                 <div class="password-strength" id="passwordStrength">
                     <span class="bar" id="strengthBar1"></span>
                     <span class="bar" id="strengthBar2"></span>
@@ -300,14 +287,16 @@
             </button>
         </form>
 
-        <!-- Links -->
         <div class="login-link">
             Already have an account? <a href="login.html">Login</a>
         </div>
     </div>
 
     <script>
+        // ✅ CORRECT API_BASE - NO /api at the end!
         const API_BASE = 'https://prepdoc-y4k3.onrender.com';
+
+        console.log('🔍 API_BASE:', API_BASE);
 
         // ============================================
         // ===== PASSWORD TOGGLE =====
@@ -350,7 +339,6 @@
             const bar3 = document.getElementById('strengthBar3');
             const hint = document.getElementById('passwordHint');
 
-            // Reset bars
             bar1.className = 'bar';
             bar2.className = 'bar';
             bar3.className = 'bar';
@@ -383,7 +371,7 @@
         });
 
         // ============================================
-        // ===== SIGNUP FORM =====
+        // ===== SIGNUP FORM - FIXED API URL =====
         // ============================================
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -398,7 +386,6 @@
             const successEl = document.getElementById('successMsg');
             const successText = document.getElementById('successText');
 
-            // Reset messages
             errorEl.classList.remove('show');
             successEl.classList.remove('show');
             errorText.textContent = '';
@@ -423,22 +410,29 @@
                 return;
             }
 
-            // Disable button
             const btn = document.getElementById('signupBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
 
             try {
-                const response = await fetch(`${API_BASE}/signup`, {
+                // ✅ FIX: Correct API endpoint with /api/
+                const url = `${API_BASE}/api/signup`;
+                console.log('📡 Sending signup request to:', url);
+                console.log('📧 Email:', email);
+                console.log('👤 Name:', name);
+
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
                 });
 
+                console.log('📥 Response status:', response.status);
                 const data = await response.json();
+                console.log('📦 Response data:', data);
 
                 if (response.ok) {
-                    successText.textContent = 'Account created successfully! Redirecting...';
+                    successText.textContent = '✅ Account created successfully! Redirecting...';
                     successEl.classList.add('show');
 
                     localStorage.setItem('token', data.token);
@@ -454,6 +448,7 @@
                     btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
                 }
             } catch (err) {
+                console.error('❌ Error:', err);
                 errorText.textContent = 'Server error. Please make sure backend is running.';
                 errorEl.classList.add('show');
                 btn.disabled = false;
