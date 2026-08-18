@@ -34,7 +34,7 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.warn('⚠️ CORS blocked origin:', origin);
+      console.warn('âš ï¸ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -79,9 +79,9 @@ if (fs.existsSync(frontendPath)) {
     app.get('/', (req, res) => {
         res.sendFile(path.join(frontendPath, 'index.html'));
     });
-    console.log('📁 Frontend served from:', frontendPath);
+    console.log('ðŸ“ Frontend served from:', frontendPath);
 } else {
-    console.log('⚠️ Frontend folder not found at:', frontendPath);
+    console.log('âš ï¸ Frontend folder not found at:', frontendPath);
     app.get('/', (req, res) => {
         res.json({ 
             message: 'PrepDOC API Server', 
@@ -125,7 +125,7 @@ app.post('/api/signup', async (req, res) => {
         const token = jwt.sign({ id: userId, email, isAdmin }, JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, user: { id: userId, name, email, isAdmin } });
     } catch (err) {
-        console.error('❌ Signup error:', err);
+        console.error('âŒ Signup error:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -158,7 +158,7 @@ app.post('/api/login', async (req, res) => {
             } 
         });
     } catch (err) {
-        console.error('❌ Login error:', err);
+        console.error('âŒ Login error:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -365,8 +365,8 @@ app.post('/api/admin/bulk-image-questions',
         const imageFiles = req.files || [];
         const { section, subject, chapter, year, difficulty, timer_minutes } = req.body;
 
-        console.log(`📸 ${imageFiles.length} images uploaded to Cloudinary by admin`);
-        console.log(`⏱️ Timer: ${timer_minutes || 30} minutes`);
+        console.log(`ðŸ“¸ ${imageFiles.length} images uploaded to Cloudinary by admin`);
+        console.log(`â±ï¸ Timer: ${timer_minutes || 30} minutes`);
 
         if (imageFiles.length === 0) {
             return res.status(400).json({ error: 'At least one image is required' });
@@ -390,7 +390,7 @@ app.post('/api/admin/bulk-image-questions',
                 [testTitle, 'Bulk Upload', 'badge', duration, imageFiles.length, `Bulk uploaded questions for ${chapter}`, 1, 'chapterwise', subjectName]
             );
             testId = result.lastID;
-            console.log(`✅ Test created with ID: ${testId}, Duration: ${duration}`);
+            console.log(`âœ… Test created with ID: ${testId}, Duration: ${duration}`);
         }
 
         for (let i = 0; i < imageFiles.length; i++) {
@@ -437,7 +437,7 @@ app.post('/api/admin/bulk-image-questions',
             try {
                 await db.run(sql, params);
                 successCount++;
-                console.log(`✅ Question ${i+1} added with Cloudinary image: ${imageUrl}`);
+                console.log(`âœ… Question ${i+1} added with Cloudinary image: ${imageUrl}`);
             } catch (err) {
                 errorCount++;
                 errors.push(`Row ${i+1}: ${err.message}`);
@@ -511,7 +511,7 @@ app.get('/api/admin/users', authenticate, requireAdmin, async (req, res) => {
         );
         res.json(rows);
     } catch (err) {
-        console.error('❌ Error fetching users:', err);
+        console.error('âŒ Error fetching users:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -531,7 +531,7 @@ app.delete('/api/admin/users/:id', authenticate, requireAdmin, async (req, res) 
         await db.run('DELETE FROM users WHERE id = $1', [id]);
         res.json({ success: true, message: 'User deleted successfully!' });
     } catch (err) {
-        console.error('❌ Error deleting user:', err);
+        console.error('âŒ Error deleting user:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -552,7 +552,7 @@ app.put('/api/admin/users/:id/role', authenticate, requireAdmin, async (req, res
         await db.run('UPDATE users SET is_admin = $1 WHERE id = $2', [is_admin, id]);
         res.json({ success: true, message: 'User role updated successfully!' });
     } catch (err) {
-        console.error('❌ Error updating user role:', err);
+        console.error('âŒ Error updating user role:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -572,7 +572,7 @@ app.get('/api/health', (req, res) => {
 // ===== ERROR HANDLING =====
 // ============================================
 app.use((err, req, res, next) => {
-    console.error('❌ Error:', err);
+    console.error('âŒ Error:', err);
     res.status(500).json({ 
         error: err.message || 'Internal server error',
         success: false
@@ -582,19 +582,44 @@ app.use((err, req, res, next) => {
 // ============================================
 // ===== START SERVER =====
 // ============================================
+
+    // ============================================
+    // ===== AUTO-INITIALIZE DATABASE =====
+    // ============================================
+    async function initializeDatabase() {
+        try {
+            const admin = await db.get('SELECT * FROM users WHERE email = ', ['aniket808089@gmail.com']);
+            if (!admin) {
+                console.log('📦 No users found, initializing database...');
+                try {
+                    require('./init-db.js');
+                } catch (initErr) {
+                    console.error('❌ Error running init-db.js:', initErr.message);
+                }
+            } else {
+                console.log('✅ Database already initialized');
+            }
+        } catch (err) {
+            console.error('❌ Error checking database:', err);
+        }
+    }
+
+    initializeDatabase();
+
+
 app.listen(PORT, () => {
-    console.log(`🩺 PrepDOC Server running at http://localhost:${PORT}`);
-    console.log(`📚 API Endpoints:`);
-    console.log(`   🔐 Auth: POST /api/signup, POST /api/login`);
-    console.log(`   📝 Tests: GET /api/tests, GET /api/tests/:id`);
-    console.log(`   📚 Questions: GET /api/questions`);
-    console.log(`   🔧 Admin (Protected):`);
+    console.log(`ðŸ©º PrepDOC Server running at http://localhost:${PORT}`);
+    console.log(`ðŸ“š API Endpoints:`);
+    console.log(`   ðŸ” Auth: POST /api/signup, POST /api/login`);
+    console.log(`   ðŸ“ Tests: GET /api/tests, GET /api/tests/:id`);
+    console.log(`   ðŸ“š Questions: GET /api/questions`);
+    console.log(`   ðŸ”§ Admin (Protected):`);
     console.log(`      GET  /api/admin/questions`);
     console.log(`      POST /api/admin/bulk-image-questions`);
     console.log(`      DELETE /api/admin/questions/:id`);
-    console.log(`   📂 Subjects: GET /api/subjects`);
-    console.log(`   🏥 Health: GET /api/health`);
-    console.log(`📸 Cloudinary: ${cloudinary.config().cloud_name}`);
-    console.log(`👑 Admin: aniket808089@gmail.com`);
-    console.log(`🌍 CORS allowed origins:`, allowedOrigins);
+    console.log(`   ðŸ“‚ Subjects: GET /api/subjects`);
+    console.log(`   ðŸ¥ Health: GET /api/health`);
+    console.log(`ðŸ“¸ Cloudinary: ${cloudinary.config().cloud_name}`);
+    console.log(`ðŸ‘‘ Admin: aniket808089@gmail.com`);
+    console.log(`ðŸŒ CORS allowed origins:`, allowedOrigins);
 });
