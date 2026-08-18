@@ -117,7 +117,29 @@ async function createTables() {
             )
         `);
 
+        // ===== TEST CHAPTERS TABLE (NEW) =====
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS test_chapters (
+                id SERIAL PRIMARY KEY,
+                test_id INTEGER REFERENCES tests(id) ON DELETE CASCADE,
+                chapter_name TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Create index for faster queries
+        await pool.query(`
+            CREATE INDEX IF NOT EXISTS idx_test_chapters_test_id ON test_chapters(test_id)
+        `);
+
         console.log('✅ PostgreSQL tables created successfully!');
+        console.log('   - users');
+        console.log('   - tests');
+        console.log('   - subjects');
+        console.log('   - questions');
+        console.log('   - user_results');
+        console.log('   - test_chapters (NEW)');
     } catch (err) {
         console.error('❌ Error creating tables:', err);
     }
@@ -125,7 +147,10 @@ async function createTables() {
 
 createTables();
 
-// ===== Database wrapper to maintain compatibility =====
+// ============================================
+// ===== DATABASE WRAPPER =====
+// ============================================
+
 const db = {
     // For queries that return a single row
     get: async (sql, params) => {
