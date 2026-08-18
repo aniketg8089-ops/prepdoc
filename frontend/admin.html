@@ -307,6 +307,8 @@
         .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
         .btn-warning { background: #f59e0b; color: #fff; }
         .btn-warning:hover { background: #d97706; }
+        .btn-outline { background: #e2e8f0; color: #1a1a2e; }
+        .btn-outline:hover { background: #cbd5e1; }
 
         .image-upload-area {
             border: 2px dashed #94a3b8;
@@ -574,6 +576,41 @@
             display: block;
         }
 
+        /* Chapter input row for create test */
+        .chapter-input-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+        .chapter-input-row input[type="text"] {
+            flex: 1;
+            padding: 0.5rem 0.8rem;
+            border: 2px solid #eef2ff;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .chapter-input-row input[type="text"]:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+        .chapter-input-row select {
+            width: 120px;
+            padding: 0.5rem 0.8rem;
+            border: 2px solid #eef2ff;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: #fff;
+            transition: 0.2s;
+        }
+        .chapter-input-row select:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+
         @media (max-width: 768px) {
             .weekly-sections {
                 grid-template-columns: 1fr 1fr;
@@ -594,6 +631,12 @@
             .section-tabs .tab-btn { justify-content: center; }
             .timer-box { flex-direction: column; align-items: stretch; }
             .timer-box .timer-input input { width: 100%; }
+            .chapter-input-row {
+                flex-wrap: wrap;
+            }
+            .chapter-input-row select {
+                width: 100%;
+            }
         }
         @media (max-width: 480px) {
             .weekly-sections {
@@ -659,6 +702,9 @@
                     <button class="btn btn-success" onclick="showTestType('fullsyllabus')">
                         <i class="fas fa-trophy"></i> Full Syllabus
                     </button>
+                    <button class="btn btn-primary" onclick="showCreateTest()" style="background:#8b5cf6;">
+                        <i class="fas fa-plus-circle"></i> Create New Test
+                    </button>
                 </div>
 
                 <!-- Chapterwise -->
@@ -681,6 +727,75 @@
                         </div>
                     </div>
                     <div id="testChaptersContainer"></div>
+                </div>
+
+                <!-- ============================================ -->
+                <!-- ===== CREATE TEST CARD ===== -->
+                <!-- ============================================ -->
+                <div class="card" id="createTestCard" style="display:none;">
+                    <h2><i class="fas fa-plus-circle"></i> Create New Test</h2>
+                    <form id="createTestForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Test Name <span class="required">*</span></label>
+                                <input type="text" id="testName" placeholder="e.g., Week 1: Basic Physics" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Test Type <span class="required">*</span></label>
+                                <select id="testType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="weekly">Weekly Test</option>
+                                    <option value="full">Full Syllabus</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Duration <span class="required">*</span></label>
+                                <input type="text" id="testDuration" placeholder="e.g., 3h 20m or 1h 30m" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <select id="testSubject">
+                                    <option value="All">All Subjects</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                    <option value="Biology">Biology</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Chapters <span class="required">*</span></label>
+                            <p style="font-size:0.85rem;color:#64748b;margin-bottom:0.5rem;">
+                                <i class="fas fa-info-circle"></i> Add chapters that will be covered in this test
+                            </p>
+                            <div id="chaptersContainer">
+                                <div class="chapter-input-row">
+                                    <input type="text" class="chapter-name" placeholder="Chapter name" />
+                                    <select class="chapter-subject">
+                                        <option value="Physics">Physics</option>
+                                        <option value="Chemistry">Chemistry</option>
+                                        <option value="Biology">Biology</option>
+                                    </select>
+                                    <button type="button" class="btn btn-danger btn-sm remove-chapter" style="padding:0.4rem 0.8rem;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="addChapterRow()" style="margin-top:0.5rem;">
+                                <i class="fas fa-plus"></i> Add Chapter
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Create Test & Continue to Upload
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="hideCreateTest()" style="margin-left:0.5rem;">
+                            Cancel
+                        </button>
+                    </form>
                 </div>
 
                 <!-- ============================================ -->
@@ -1125,6 +1240,7 @@
             document.getElementById('testChapterwise').style.display = 'none';
             document.getElementById('testWeekly').style.display = 'none';
             document.getElementById('testFullSyllabus').style.display = 'none';
+            document.getElementById('createTestCard').style.display = 'none';
             
             if (type === 'chapterwise') {
                 document.getElementById('testChapterwise').style.display = 'block';
@@ -1135,6 +1251,149 @@
                 document.getElementById('testFullSyllabus').style.display = 'block';
             }
         }
+
+        // ============================================
+        // ===== CREATE TEST FUNCTIONS =====
+        // ============================================
+
+        function showCreateTest() {
+            document.getElementById('createTestCard').style.display = 'block';
+            document.getElementById('testWeekly').style.display = 'none';
+            document.getElementById('testFullSyllabus').style.display = 'none';
+            document.getElementById('testChapterwise').style.display = 'none';
+            // Scroll to the create test card
+            document.getElementById('createTestCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideCreateTest() {
+            document.getElementById('createTestCard').style.display = 'none';
+            // Show the weekly section by default
+            document.getElementById('testWeekly').style.display = 'block';
+            showWeek('week1');
+        }
+
+        function addChapterRow() {
+            const container = document.getElementById('chaptersContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'chapter-input-row';
+            newRow.innerHTML = `
+                <input type="text" class="chapter-name" placeholder="Chapter name" />
+                <select class="chapter-subject">
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                </select>
+                <button type="button" class="btn btn-danger btn-sm remove-chapter" style="padding:0.4rem 0.8rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(newRow);
+            updateRemoveButtons();
+        }
+
+        function updateRemoveButtons() {
+            const rows = document.querySelectorAll('.chapter-input-row');
+            rows.forEach((row, index) => {
+                const btn = row.querySelector('.remove-chapter');
+                if (rows.length === 1) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.style.display = 'inline-block';
+                    btn.onclick = function() {
+                        row.remove();
+                        updateRemoveButtons();
+                    };
+                }
+            });
+        }
+
+        // Initialize remove buttons
+        setTimeout(updateRemoveButtons, 100);
+
+        // ============================================
+        // ===== SUBMIT CREATE TEST FORM =====
+        // ============================================
+        document.getElementById('createTestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('testName').value.trim();
+            const type = document.getElementById('testType').value;
+            const duration = document.getElementById('testDuration').value.trim();
+            const subject = document.getElementById('testSubject').value;
+
+            if (!name || !type || !duration) {
+                showError('Please fill all required fields');
+                return;
+            }
+
+            // Get chapters
+            const chapterRows = document.querySelectorAll('.chapter-input-row');
+            const chapters = [];
+            chapterRows.forEach(row => {
+                const nameInput = row.querySelector('.chapter-name');
+                const subjectSelect = row.querySelector('.chapter-subject');
+                if (nameInput.value.trim()) {
+                    chapters.push({
+                        name: nameInput.value.trim(),
+                        subject: subjectSelect.value
+                    });
+                }
+            });
+
+            if (chapters.length === 0) {
+                showError('Please add at least one chapter');
+                return;
+            }
+
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    showError('Please login first');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/api/admin/create-test`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ name, type, chapters, duration, subject })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('✅ Test created successfully! Redirecting to upload...');
+                    // Store test info for bulk upload
+                    sessionStorage.setItem('testId', data.testId);
+                    sessionStorage.setItem('testName', name);
+                    sessionStorage.setItem('testType', type);
+                    
+                    // Auto-fill bulk upload form
+                    document.getElementById('bulk_image_section').value = 'testseries';
+                    document.getElementById('bulk_image_chapter').value = name;
+                    
+                    // Scroll to bulk upload
+                    setTimeout(() => {
+                        document.getElementById('bulkImageForm').scrollIntoView({ behavior: 'smooth' });
+                        document.getElementById('createTestCard').style.display = 'none';
+                    }, 1500);
+                } else {
+                    showError(data.error || 'Failed to create test');
+                }
+            } catch (err) {
+                showError('Server error: ' + err.message);
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Create Test & Continue to Upload';
+        });
 
         // ============================================
         // ===== WEEK FUNCTIONS =====
@@ -1945,6 +2204,7 @@
         console.log('⏱️ Default Timer: 3h 20m (200 minutes) for Weekly & Full Syllabus');
         console.log('📅 Weekly Test: 4 sections with chapter selection');
         console.log('📚 Full Syllabus: No syllabus section');
+        console.log('✨ New: Create custom tests with chapters!');
     </script>
 </body>
 </html>
