@@ -34,7 +34,7 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      console.warn('âš ï¸ CORS blocked origin:', origin);
+      console.warn('⚠️ CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -79,9 +79,9 @@ if (fs.existsSync(frontendPath)) {
     app.get('/', (req, res) => {
         res.sendFile(path.join(frontendPath, 'index.html'));
     });
-    console.log('ðŸ“ Frontend served from:', frontendPath);
+    console.log('📁 Frontend served from:', frontendPath);
 } else {
-    console.log('âš ï¸ Frontend folder not found at:', frontendPath);
+    console.log('⚠️ Frontend folder not found at:', frontendPath);
     app.get('/', (req, res) => {
         res.json({ 
             message: 'PrepDOC API Server', 
@@ -97,6 +97,30 @@ if (fs.existsSync(frontendPath)) {
 }
 
 // ============================================
+// ===== AUTO-INITIALIZE DATABASE =====
+// ============================================
+async function initializeDatabase() {
+    try {
+        const admin = await db.get('SELECT * FROM users WHERE email = $1', ['aniket808089@gmail.com']);
+        if (!admin) {
+            console.log('📦 No users found, initializing database...');
+            try {
+                require('./init-db.js');
+            } catch (initErr) {
+                console.error('❌ Error running init-db.js:', initErr.message);
+            }
+        } else {
+            console.log('✅ Database already initialized');
+        }
+    } catch (err) {
+        console.error('❌ Error checking database:', err);
+    }
+}
+
+// Call after database connection
+setTimeout(initializeDatabase, 1000);
+
+// ============================================
 // ===== AUTH ROUTES =====
 // ============================================
 
@@ -107,7 +131,6 @@ app.post('/api/signup', async (req, res) => {
     }
     
     try {
-        // Check if user exists
         const existingUser = await db.get('SELECT * FROM users WHERE email = $1', [email]);
         if (existingUser) {
             return res.status(400).json({ error: 'Email already exists' });
@@ -125,7 +148,7 @@ app.post('/api/signup', async (req, res) => {
         const token = jwt.sign({ id: userId, email, isAdmin }, JWT_SECRET, { expiresIn: '7d' });
         res.json({ token, user: { id: userId, name, email, isAdmin } });
     } catch (err) {
-        console.error('âŒ Signup error:', err);
+        console.error('❌ Signup error:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -158,7 +181,7 @@ app.post('/api/login', async (req, res) => {
             } 
         });
     } catch (err) {
-        console.error('âŒ Login error:', err);
+        console.error('❌ Login error:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -217,6 +240,64 @@ app.get('/api/tests/:id', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+// ===== GET TEST WITH CHAPTERS =====
+app.get('/api/tests/:id/with-chapters', async (req, res) => {
+    try {
+        const testId = req.params.id;
+        const test = await db.get('SELECT * FROM tests WHERE id = $1', [testId]);
+        if (!test) {
+            return res.status(404).json({ error: 'Test not found' });
+        }
+        
+        const chapters = await db.all(
+            'SELECT chapter_name as name, subject FROM test_chapters WHERE test_id = $1',
+            [testId]
+        );
+        
+        res.json({ ...test, chapters });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ===== GET WEEKLY TESTS =====
+app.get('/api/tests/weekly', async (req, res) => {
+    try {
+        const tests = await db.all(
+            `SELECT t.*, 
+             (SELECT json_agg(json_build_object('name', tc.chapter_name, 'subject', tc.subject)) 
+              FROM test_chapters tc WHERE tc.test_id = t.id) as chapters
+             FROM tests t 
+             WHERE t.category = 'weekly' 
+             ORDER BY t.created_at DESC`
+        );
+        res.json(tests);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ===== GET FULL SYLLABUS TESTS =====
+app.get('/api/tests/full', async (req, res) => {
+    try {
+        const tests = await db.all(
+            `SELECT t.*, 
+             (SELECT json_agg(json_build_object('name', tc.chapter_name, 'subject', tc.subject)) 
+              FROM test_chapters tc WHERE tc.test_id = t.id) as chapters
+             FROM tests t 
+             WHERE t.category = 'full' 
+             ORDER BY t.created_at DESC`
+        );
+        res.json(tests);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ============================================
+// ===== QUESTIONS ROUTES =====
+// ============================================
 
 app.get('/api/questions', async (req, res) => {
     const { subject_id, section_type, chapter, year } = req.query;
@@ -331,6 +412,7 @@ app.get('/api/user/results', authenticate, async (req, res) => {
 // ===== ADMIN ROUTES =====
 // ============================================
 
+// ===== ADMIN - GET ALL QUESTIONS =====
 app.get('/api/admin/questions', authenticate, requireAdmin, async (req, res) => {
     const { section_type, subject_id, chapter, year } = req.query;
     let query = `SELECT q.*, s.name as subject_name 
@@ -353,6 +435,44 @@ app.get('/api/admin/questions', authenticate, requireAdmin, async (req, res) => 
     }
 });
 
+// ===== ADMIN - CREATE TEST WITH CHAPTERS =====
+app.post('/api/admin/create-test', authenticate, requireAdmin, async (req, res) => {
+    try {
+        const { name, type, chapters, duration, subject } = req.body;
+        
+        if (!name || !type || !chapters || !duration) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        // Create test
+        const testResult = await db.run(
+            `INSERT INTO tests (title, badge, badge_color, duration, question_count, description, is_free, category, subject) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+            [name, type, type === 'weekly' ? '#db2777' : '#16a34a', duration, 0, `Dynamic ${type} test`, 1, type, subject || 'All']
+        );
+        
+        const testId = testResult.lastID;
+
+        // Add chapters
+        for (const chapter of chapters) {
+            await db.run(
+                `INSERT INTO test_chapters (test_id, chapter_name, subject) VALUES ($1, $2, $3)`,
+                [testId, chapter.name, chapter.subject]
+            );
+        }
+
+        res.json({ 
+            success: true, 
+            testId: testId,
+            message: 'Test created successfully!'
+        });
+
+    } catch (err) {
+        console.error('❌ Error creating test:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ============================================
 // ===== BULK IMAGE UPLOAD (Cloudinary) =====
 // ============================================
@@ -365,8 +485,8 @@ app.post('/api/admin/bulk-image-questions',
         const imageFiles = req.files || [];
         const { section, subject, chapter, year, difficulty, timer_minutes } = req.body;
 
-        console.log(`ðŸ“¸ ${imageFiles.length} images uploaded to Cloudinary by admin`);
-        console.log(`â±ï¸ Timer: ${timer_minutes || 30} minutes`);
+        console.log(`📸 ${imageFiles.length} images uploaded to Cloudinary by admin`);
+        console.log(`⏱️ Timer: ${timer_minutes || 30} minutes`);
 
         if (imageFiles.length === 0) {
             return res.status(400).json({ error: 'At least one image is required' });
@@ -390,7 +510,7 @@ app.post('/api/admin/bulk-image-questions',
                 [testTitle, 'Bulk Upload', 'badge', duration, imageFiles.length, `Bulk uploaded questions for ${chapter}`, 1, 'chapterwise', subjectName]
             );
             testId = result.lastID;
-            console.log(`âœ… Test created with ID: ${testId}, Duration: ${duration}`);
+            console.log(`✅ Test created with ID: ${testId}, Duration: ${duration}`);
         }
 
         for (let i = 0; i < imageFiles.length; i++) {
@@ -437,7 +557,7 @@ app.post('/api/admin/bulk-image-questions',
             try {
                 await db.run(sql, params);
                 successCount++;
-                console.log(`âœ… Question ${i+1} added with Cloudinary image: ${imageUrl}`);
+                console.log(`✅ Question ${i+1} added with Cloudinary image: ${imageUrl}`);
             } catch (err) {
                 errorCount++;
                 errors.push(`Row ${i+1}: ${err.message}`);
@@ -464,7 +584,7 @@ app.post('/api/admin/bulk-image-questions',
     }
 });
 
-// ===== DELETE QUESTION - Protected =====
+// ===== ADMIN - DELETE QUESTION =====
 app.delete('/api/admin/questions/:id', authenticate, requireAdmin, async (req, res) => {
     const id = req.params.id;
     try {
@@ -482,6 +602,7 @@ app.delete('/api/admin/questions/:id', authenticate, requireAdmin, async (req, r
     }
 });
 
+// ===== ADMIN - STATS =====
 app.get('/api/admin/stats', authenticate, requireAdmin, async (req, res) => {
     try {
         const stats = {};
@@ -502,8 +623,10 @@ app.get('/api/admin/stats', authenticate, requireAdmin, async (req, res) => {
 });
 
 // ============================================
-// ===== ADMIN - GET ALL USERS =====
+// ===== ADMIN - USER MANAGEMENT =====
 // ============================================
+
+// ===== GET ALL USERS =====
 app.get('/api/admin/users', authenticate, requireAdmin, async (req, res) => {
     try {
         const rows = await db.all(
@@ -511,14 +634,12 @@ app.get('/api/admin/users', authenticate, requireAdmin, async (req, res) => {
         );
         res.json(rows);
     } catch (err) {
-        console.error('âŒ Error fetching users:', err);
+        console.error('❌ Error fetching users:', err);
         res.status(500).json({ error: err.message });
     }
 });
 
-// ============================================
-// ===== ADMIN - DELETE USER =====
-// ============================================
+// ===== DELETE USER =====
 app.delete('/api/admin/users/:id', authenticate, requireAdmin, async (req, res) => {
     const id = req.params.id;
     
@@ -531,14 +652,12 @@ app.delete('/api/admin/users/:id', authenticate, requireAdmin, async (req, res) 
         await db.run('DELETE FROM users WHERE id = $1', [id]);
         res.json({ success: true, message: 'User deleted successfully!' });
     } catch (err) {
-        console.error('âŒ Error deleting user:', err);
+        console.error('❌ Error deleting user:', err);
         res.status(500).json({ error: err.message });
     }
 });
 
-// ============================================
-// ===== ADMIN - UPDATE USER ROLE =====
-// ============================================
+// ===== UPDATE USER ROLE =====
 app.put('/api/admin/users/:id/role', authenticate, requireAdmin, async (req, res) => {
     const id = req.params.id;
     const { is_admin } = req.body;
@@ -552,7 +671,7 @@ app.put('/api/admin/users/:id/role', authenticate, requireAdmin, async (req, res
         await db.run('UPDATE users SET is_admin = $1 WHERE id = $2', [is_admin, id]);
         res.json({ success: true, message: 'User role updated successfully!' });
     } catch (err) {
-        console.error('âŒ Error updating user role:', err);
+        console.error('❌ Error updating user role:', err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -572,7 +691,7 @@ app.get('/api/health', (req, res) => {
 // ===== ERROR HANDLING =====
 // ============================================
 app.use((err, req, res, next) => {
-    console.error('âŒ Error:', err);
+    console.error('❌ Error:', err);
     res.status(500).json({ 
         error: err.message || 'Internal server error',
         success: false
@@ -582,44 +701,21 @@ app.use((err, req, res, next) => {
 // ============================================
 // ===== START SERVER =====
 // ============================================
-
-    // ============================================
-    // ===== AUTO-INITIALIZE DATABASE =====
-    // ============================================
-    async function initializeDatabase() {
-        try {
-            const admin = await db.get('SELECT * FROM users WHERE email = ', ['aniket808089@gmail.com']);
-            if (!admin) {
-                console.log('📦 No users found, initializing database...');
-                try {
-                    require('./init-db.js');
-                } catch (initErr) {
-                    console.error('❌ Error running init-db.js:', initErr.message);
-                }
-            } else {
-                console.log('✅ Database already initialized');
-            }
-        } catch (err) {
-            console.error('❌ Error checking database:', err);
-        }
-    }
-
-    initializeDatabase();
-
-
 app.listen(PORT, () => {
-    console.log(`ðŸ©º PrepDOC Server running at http://localhost:${PORT}`);
-    console.log(`ðŸ“š API Endpoints:`);
-    console.log(`   ðŸ” Auth: POST /api/signup, POST /api/login`);
-    console.log(`   ðŸ“ Tests: GET /api/tests, GET /api/tests/:id`);
-    console.log(`   ðŸ“š Questions: GET /api/questions`);
-    console.log(`   ðŸ”§ Admin (Protected):`);
+    console.log(`🩺 PrepDOC Server running at http://localhost:${PORT}`);
+    console.log(`📚 API Endpoints:`);
+    console.log(`   🔐 Auth: POST /api/signup, POST /api/login`);
+    console.log(`   📝 Tests: GET /api/tests, GET /api/tests/:id`);
+    console.log(`   📚 Questions: GET /api/questions`);
+    console.log(`   🔧 Admin (Protected):`);
     console.log(`      GET  /api/admin/questions`);
     console.log(`      POST /api/admin/bulk-image-questions`);
     console.log(`      DELETE /api/admin/questions/:id`);
-    console.log(`   ðŸ“‚ Subjects: GET /api/subjects`);
-    console.log(`   ðŸ¥ Health: GET /api/health`);
-    console.log(`ðŸ“¸ Cloudinary: ${cloudinary.config().cloud_name}`);
-    console.log(`ðŸ‘‘ Admin: aniket808089@gmail.com`);
-    console.log(`ðŸŒ CORS allowed origins:`, allowedOrigins);
+    console.log(`      POST /api/admin/create-test`);
+    console.log(`   👥 Users: GET /api/admin/users`);
+    console.log(`   📂 Subjects: GET /api/subjects`);
+    console.log(`   🏥 Health: GET /api/health`);
+    console.log(`📸 Cloudinary: ${cloudinary.config().cloud_name}`);
+    console.log(`👑 Admin: aniket808089@gmail.com`);
+    console.log(`🌍 CORS allowed origins:`, allowedOrigins);
 });
