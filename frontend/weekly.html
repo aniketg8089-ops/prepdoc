@@ -18,10 +18,11 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid #eef2ff;
         }
         .navbar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         
-        .logo { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .logo { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; color: #1a1a2e; }
         .logo i { color: #0ea5e9; font-size: 1.8rem; }
         .logo span { color: #0ea5e9; }
         .logo .doc { background: #0ea5e9; color: white; padding: 2px 10px; border-radius: 30px; font-size: 0.7rem; margin-left: 4px; }
@@ -59,45 +60,85 @@
         .section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
         .section-title i { color: #db2777; }
         
-        /* ===== WEEKLY CARDS - FIXED BORDER ===== */
         .weekly-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.2rem;
         }
         .weekly-card {
             background: #fff;
             border-radius: 14px;
-            padding: 1.2rem 1.5rem;
-            border: 3px solid #f9a8d4;  /* ✅ Always visible border */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 1.5rem;
+            border: 3px solid #f9a8d4;
             transition: all 0.3s ease;
-            outline: none;  /* ✅ Remove default outline */
         }
-        .weekly-card:focus { outline: none; }
         .weekly-card:hover {
             border-color: #db2777;
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(219, 39, 119, 0.10);
         }
-        .weekly-card .week-info { display: flex; flex-direction: column; }
-        .weekly-card .week-name { font-weight: 700; font-size: 1rem; }
-        .weekly-card .week-date { font-size: 0.8rem; color: #64748b; }
-        .weekly-card .week-status {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 50px;
+        .weekly-card .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
         }
-        .weekly-card .week-status.available { background: #dcfce7; color: #16a34a; }
-        .weekly-card .week-status.upcoming { background: #fef3c7; color: #d97706; }
-        .weekly-card .week-status.completed { background: #f1f5f9; color: #94a3b8; }
+        .weekly-card .test-name { font-weight: 700; font-size: 1.1rem; }
+        .weekly-card .test-badge {
+            font-size: 0.7rem;
+            background: #fce7f3;
+            color: #db2777;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+        .weekly-card .test-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin: 0.5rem 0;
+            flex-wrap: wrap;
+        }
+        .weekly-card .test-chapters {
+            font-size: 0.85rem;
+            color: #475569;
+            margin: 0.5rem 0;
+        }
+        .weekly-card .test-chapters .ch-tag {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            margin: 2px;
+            color: #1e293b;
+        }
+        .weekly-card .card-footer {
+            margin-top: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .weekly-card .free-tag { color: #16a34a; font-weight: 700; }
         
-        .btn { display: inline-block; padding: 0.4rem 1.2rem; border-radius: 50px; font-weight: 600; font-size: 0.8rem; border: none; cursor: pointer; background: #db2777; color: #fff; text-decoration: none; transition: all 0.2s; box-shadow: 0 4px 12px rgba(219,39,119,0.3); outline: none; }
-        .btn:focus { outline: none; }
-        .btn:hover { background: #be185d; transform: scale(1.02); }
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary { background: #db2777; color: #fff; }
+        .btn-primary:hover { background: #be185d; transform: scale(1.02); }
+        .btn-outline { background: transparent; border: 2px solid #db2777; color: #db2777; }
+        .btn-outline:hover { background: #db2777; color: #fff; }
         
         .footer {
             background: #0f172a;
@@ -113,6 +154,21 @@
         .footer-copy { font-size: 0.8rem; color: #64748b; }
         .footer .brand { color: #0ea5e9; font-weight: 700; }
         
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        .loading i { font-size: 2rem; display: block; margin-bottom: 1rem; }
+        
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        .empty-state i { font-size: 3rem; display: block; margin-bottom: 1rem; color: #dbeafe; }
+        
         @media (max-width: 768px) {
             .hamburger { display: flex; }
             .nav-links {
@@ -127,13 +183,13 @@
             .nav-links.active { display: flex; }
             .nav-links a { padding: 0.8rem 0; width: 100%; text-align: center; border-bottom: 1px solid #f1f5f9; }
             .nav-links a:last-child { border-bottom: none; }
-            
             .page-header h1 { font-size: 1.8rem; }
             .weekly-grid { grid-template-columns: 1fr; }
         }
-        
         @media (max-width: 480px) {
             .page-header h1 { font-size: 1.5rem; }
+            .weekly-card .card-footer { flex-direction: column; align-items: stretch; }
+            .weekly-card .card-footer .btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -162,7 +218,7 @@
     <section class="page-header">
         <div class="container">
             <h1>📅 Weekly Test Series</h1>
-            <p>New test every week to track your progress</p>
+            <p>Dynamic weekly tests created by your teachers</p>
             <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
         </div>
     </section>
@@ -170,95 +226,12 @@
     <section class="section">
         <div class="container">
             <div class="section-title">
-                <i class="fas fa-calendar-alt"></i> This Week's Tests
-                <span class="tag" style="font-size:0.7rem;background:#fce7f3;color:#db2777;padding:2px 14px;border-radius:50px;font-weight:600;margin-left:auto;">12 Tests</span>
+                <i class="fas fa-calendar-alt"></i> Available Weekly Tests
+                <span class="tag" id="testCount" style="font-size:0.7rem;background:#fce7f3;color:#db2777;padding:2px 14px;border-radius:50px;font-weight:600;margin-left:auto;">Loading...</span>
             </div>
 
-            <div class="weekly-grid">
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 1: Basic Physics</span>
-                        <span class="week-date">📅 Jan 1-7, 2026</span>
-                    </div>
-                    <button class="btn" onclick="alert('Starting Week 1 Test...')">Start</button>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 2: Organic Chemistry</span>
-                        <span class="week-date">📅 Jan 8-14, 2026</span>
-                    </div>
-                    <button class="btn" onclick="alert('Starting Week 2 Test...')">Start</button>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 3: Human Physiology</span>
-                        <span class="week-date">📅 Jan 15-21, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 4: Inorganic Chemistry</span>
-                        <span class="week-date">📅 Jan 22-28, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 5: Genetics & Evolution</span>
-                        <span class="week-date">📅 Jan 29 - Feb 4, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 6: Modern Physics</span>
-                        <span class="week-date">📅 Feb 5-11, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 7: Biomolecules</span>
-                        <span class="week-date">📅 Feb 12-18, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 8: Electrostatics</span>
-                        <span class="week-date">📅 Feb 19-25, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 9: Chemical Bonding</span>
-                        <span class="week-date">📅 Feb 26 - Mar 4, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 10: Plant Physiology</span>
-                        <span class="week-date">📅 Mar 5-11, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 11: Wave Optics</span>
-                        <span class="week-date">📅 Mar 12-18, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
-                <div class="weekly-card">
-                    <div class="week-info">
-                        <span class="week-name">Week 12: Coordination Compounds</span>
-                        <span class="week-date">📅 Mar 19-25, 2026</span>
-                    </div>
-                    <span class="week-status upcoming">Upcoming</span>
-                </div>
+            <div id="weeklyGrid" class="weekly-grid">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading tests...</div>
             </div>
         </div>
     </section>
@@ -278,6 +251,126 @@
     </footer>
 
     <script>
+        const API_BASE = 'https://prepdoc-y4k3.onrender.com';
+
+        // ============================================
+        // ===== LOAD WEEKLY TESTS FROM DATABASE =====
+        // ============================================
+        async function loadWeeklyTests() {
+            try {
+                console.log('🔄 Loading weekly tests...');
+                const response = await fetch(`${API_BASE}/api/tests/weekly`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const tests = await response.json();
+                console.log('📦 Weekly tests:', tests);
+                
+                const grid = document.getElementById('weeklyGrid');
+                const countBadge = document.getElementById('testCount');
+                
+                if (!tests || tests.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-plus"></i>
+                            <h3>No Weekly Tests Available</h3>
+                            <p style="color:#94a3b8;margin-top:0.5rem;">Check back later or contact your teacher.</p>
+                            ${localStorage.getItem('token') ? 
+                                `<a href="admin.html" style="display:inline-block;margin-top:1rem;color:#db2777;font-weight:600;">📝 Go to Admin Panel to create tests</a>` : 
+                                ''}
+                        </div>
+                    `;
+                    countBadge.textContent = '0 Tests';
+                    return;
+                }
+
+                countBadge.textContent = `${tests.length} Tests`;
+
+                grid.innerHTML = tests.map(test => `
+                    <div class="weekly-card">
+                        <div class="test-header">
+                            <div>
+                                <div class="test-name">${test.title}</div>
+                                <span class="test-badge">📅 Weekly</span>
+                            </div>
+                            <span style="font-size:0.8rem;color:#64748b;">⏱️ ${test.duration || 'N/A'}</span>
+                        </div>
+                        <div class="test-meta">
+                            <span><i class="far fa-question-circle"></i> ${test.question_count || 0} Questions</span>
+                            <span><i class="fas fa-tag"></i> ${test.subject || 'All Subjects'}</span>
+                            ${test.created_at ? `<span><i class="far fa-calendar-alt"></i> ${new Date(test.created_at).toLocaleDateString('en-IN')}</span>` : ''}
+                        </div>
+                        ${test.chapters && test.chapters.length > 0 ? `
+                            <div class="test-chapters">
+                                📚 Chapters: 
+                                ${test.chapters.map(ch => `<span class="ch-tag">${ch.name}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="card-footer">
+                            <span class="free-tag"><i class="fas fa-gift"></i> Free</span>
+                            <button class="btn btn-primary" onclick="startTest(${test.id})">
+                                <i class="fas fa-play"></i> Attempt Test
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('❌ Error loading weekly tests:', err);
+                document.getElementById('weeklyGrid').innerHTML = `
+                    <div class="empty-state" style="color:#dc2626;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error Loading Tests</h3>
+                        <p style="color:#64748b;margin-top:0.5rem;">${err.message}</p>
+                        <button class="btn btn-primary" onclick="loadWeeklyTests()" style="margin-top:1rem;">
+                            <i class="fas fa-sync"></i> Retry
+                        </button>
+                    </div>
+                `;
+                document.getElementById('testCount').textContent = 'Error';
+            }
+        }
+
+        // ============================================
+        // ===== START TEST =====
+        // ============================================
+        async function startTest(testId) {
+            try {
+                // Check if user is logged in
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('Please login first to attempt the test.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Fetch test details
+                const response = await fetch(`${API_BASE}/api/tests/${testId}/with-chapters`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const test = await response.json();
+                console.log('📝 Test details:', test);
+                
+                // Store test info in sessionStorage
+                sessionStorage.setItem('weeklyTestId', testId);
+                sessionStorage.setItem('weeklyTestName', test.title);
+                sessionStorage.setItem('weeklyTestDuration', test.duration || '30m');
+                
+                // Redirect to test page
+                window.location.href = `test.html?id=${testId}`;
+            } catch (err) {
+                console.error('❌ Error starting test:', err);
+                alert(`Error starting test: ${err.message}`);
+            }
+        }
+
+        // ============================================
+        // ===== HAMBURGER MENU =====
+        // ============================================
         const hamburger = document.getElementById('hamburger');
         const navLinks = document.getElementById('navLinks');
         hamburger.addEventListener('click', function() {
@@ -290,7 +383,11 @@
                 navLinks.classList.remove('active');
             });
         });
-    </script>
 
+        // ============================================
+        // ===== LOAD ON PAGE LOAD =====
+        // ============================================
+        loadWeeklyTests();
+    </script>
 </body>
 </html>
