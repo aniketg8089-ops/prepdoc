@@ -117,8 +117,39 @@ async function initializeDatabase() {
     }
 }
 
+// ============================================
+// ===== AUTO-INSERT SUBJECTS =====
+// ============================================
+async function ensureSubjects() {
+    try {
+        const count = await db.get('SELECT COUNT(*) as total FROM subjects');
+        if (count.total === 0) {
+            console.log('📦 Inserting default subjects...');
+            const subjects = [
+                [1, 'Physics', 'fa-atom', 3120],
+                [2, 'Chemistry', 'fa-flask', 2980],
+                [3, 'Biology', 'fa-leaf', 4520]
+            ];
+            for (const subject of subjects) {
+                await db.run(
+                    `INSERT INTO subjects (id, name, icon, question_count) 
+                     VALUES ($1, $2, $3, $4) 
+                     ON CONFLICT (id) DO NOTHING`,
+                    subject
+                );
+            }
+            console.log('✅ Subjects inserted successfully!');
+        } else {
+            console.log('✅ Subjects already exist:', count.total);
+        }
+    } catch (err) {
+        console.error('❌ Error inserting subjects:', err.message);
+    }
+}
+
 // Call after database connection
 setTimeout(initializeDatabase, 1000);
+setTimeout(ensureSubjects, 1500);
 
 // ============================================
 // ===== AUTH ROUTES =====
@@ -496,10 +527,21 @@ app.post('/api/admin/bulk-image-questions',
         let errorCount = 0;
         const errors = [];
 
+        // ✅ Ensure subject exists
+        const validSubjects = [1, 2, 3];
+        const subjectId = validSubjects.includes(parseInt(subject)) ? parseInt(subject) : 1;
+
+        // Check if subject exists in database
+        const subjectExists = await db.get('SELECT id FROM subjects WHERE id = $1', [subjectId]);
+        if (!subjectExists) {
+            console.log('⚠️ Subject not found, inserting default subjects...');
+            await ensureSubjects();
+        }
+
         // Create a test entry for this bulk upload
         let testId = null;
         if (section === 'testseries') {
-            const subjectName = subject === '1' ? 'Physics' : subject === '2' ? 'Chemistry' : 'Biology';
+            const subjectName = subjectId === 1 ? 'Physics' : subjectId === 2 ? 'Chemistry' : 'Biology';
             const testTitle = `${subjectName} - ${chapter}`;
             const timerValue = parseInt(timer_minutes) || 30;
             const duration = `${timerValue}m`;
@@ -537,7 +579,7 @@ app.post('/api/admin/bulk-image-questions',
                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`;
 
             const params = [
-                parseInt(subject) || null,
+                subjectId,
                 testId || null,
                 qText,
                 optA,

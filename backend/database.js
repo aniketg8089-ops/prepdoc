@@ -74,8 +74,8 @@ async function createTables() {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS questions (
                 id SERIAL PRIMARY KEY,
-                subject_id INTEGER,
-                test_id INTEGER,
+                subject_id INTEGER REFERENCES subjects(id),
+                test_id INTEGER REFERENCES tests(id),
                 question_text TEXT,
                 option_a TEXT,
                 option_b TEXT,
@@ -93,9 +93,7 @@ async function createTables() {
                 reason TEXT,
                 image_data TEXT,
                 section_type TEXT DEFAULT 'testseries',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (subject_id) REFERENCES subjects(id),
-                FOREIGN KEY (test_id) REFERENCES tests(id)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
@@ -103,21 +101,19 @@ async function createTables() {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS user_results (
                 id SERIAL PRIMARY KEY,
-                user_id INTEGER,
-                test_id INTEGER,
+                user_id INTEGER REFERENCES users(id),
+                test_id INTEGER REFERENCES tests(id),
                 score INTEGER,
                 total_questions INTEGER,
                 correct INTEGER,
                 wrong INTEGER,
                 percentage REAL,
                 answers TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id),
-                FOREIGN KEY (test_id) REFERENCES tests(id)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
-        // ===== TEST CHAPTERS TABLE (NEW) =====
+        // Test chapters table
         await pool.query(`
             CREATE TABLE IF NOT EXISTS test_chapters (
                 id SERIAL PRIMARY KEY,
@@ -139,7 +135,7 @@ async function createTables() {
         console.log('   - subjects');
         console.log('   - questions');
         console.log('   - user_results');
-        console.log('   - test_chapters (NEW)');
+        console.log('   - test_chapters');
     } catch (err) {
         console.error('❌ Error creating tables:', err);
     }
@@ -152,7 +148,6 @@ createTables();
 // ============================================
 
 const db = {
-    // For queries that return a single row
     get: async (sql, params) => {
         try {
             const result = await pool.query(sql, params);
@@ -163,7 +158,6 @@ const db = {
         }
     },
     
-    // For queries that return multiple rows
     all: async (sql, params) => {
         try {
             const result = await pool.query(sql, params);
@@ -174,7 +168,6 @@ const db = {
         }
     },
     
-    // For INSERT/UPDATE/DELETE queries
     run: async (sql, params) => {
         try {
             const result = await pool.query(sql, params);
@@ -185,7 +178,6 @@ const db = {
         }
     },
     
-    // For running multiple queries in sequence
     serialize: async (callback) => {
         try {
             if (callback) await callback();
@@ -195,7 +187,6 @@ const db = {
         }
     },
     
-    // Raw pool for advanced queries
     pool: pool
 };
 
