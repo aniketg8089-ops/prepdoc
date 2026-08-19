@@ -127,7 +127,13 @@
             background: #f0f9ff;
         }
         .chapter-item .ch-name { font-size: 0.9rem; font-weight: 500; }
-        .chapter-item .ch-qs { font-size: 0.75rem; background: #e2e8f0; padding: 2px 10px; border-radius: 50px; color: #475569; }
+        .chapter-item .ch-qs {
+            font-size: 0.75rem;
+            background: #e2e8f0;
+            padding: 2px 10px;
+            border-radius: 50px;
+            color: #475569;
+        }
 
         .back-btn {
             display: inline-flex;
@@ -289,6 +295,8 @@
         .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
         .btn-warning { background: #f59e0b; color: #fff; }
         .btn-warning:hover { background: #d97706; }
+        .btn-outline { background: #e2e8f0; color: #1a1a2e; }
+        .btn-outline:hover { background: #cbd5e1; }
 
         .image-upload-area {
             border: 2px dashed #94a3b8;
@@ -487,6 +495,19 @@
         }
         #autoFillNotification.show { display: block; }
 
+        /* Auto-filled info message */
+        .auto-filled-info {
+            background: #f0fdf4;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+            color: #15803d;
+            display: none;
+            font-weight: 500;
+        }
+        .auto-filled-info.show { display: block; }
+
         .chapter-input-row {
             display: flex;
             gap: 0.5rem;
@@ -495,6 +516,10 @@
         }
         .chapter-input-row input { flex: 1; }
         .chapter-input-row select { width: 120px; }
+
+        #bulkFormFields {
+            transition: all 0.3s ease;
+        }
 
         @media (max-width: 768px) {
             .weekly-sections { grid-template-columns: 1fr 1fr; }
@@ -907,29 +932,37 @@
                 <br><strong>✅ Images will be stored in Cloudinary (Online)!</strong>
             </p>
 
+            <!-- Auto-Filled Info Message -->
+            <div class="auto-filled-info" id="autoFilledInfo">
+                <i class="fas fa-check-circle"></i>
+                <span id="autoFilledInfoText">Test details auto-filled! Just upload your images.</span>
+            </div>
+
             <form id="bulkImageForm" enctype="multipart/form-data">
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label>Section <span class="required">*</span></label>
-                        <select id="bulk_image_section" required>
-                            <option value="">Select Section</option>
-                            <option value="testseries">Test Series</option>
-                            <option value="practice">Practice</option>
-                            <option value="pyqs">PYQs</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Subject <span class="required">*</span></label>
-                        <select id="bulk_image_subject" required>
-                            <option value="">Select Subject</option>
-                            <option value="1">Physics</option>
-                            <option value="2">Chemistry</option>
-                            <option value="3">Biology</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label id="chapterLabel">Chapter/Syllabus <span class="required">*</span></label>
-                        <input type="text" id="bulk_image_chapter" placeholder="e.g., Cell Biology" required />
+                <div id="bulkFormFields">
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Section <span class="required">*</span></label>
+                            <select id="bulk_image_section" required>
+                                <option value="">Select Section</option>
+                                <option value="testseries">Test Series</option>
+                                <option value="practice">Practice</option>
+                                <option value="pyqs">PYQs</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject <span class="required">*</span></label>
+                            <select id="bulk_image_subject" required>
+                                <option value="">Select Subject</option>
+                                <option value="1">Physics</option>
+                                <option value="2">Chemistry</option>
+                                <option value="3">Biology</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="chapterLabel">Chapter/Syllabus <span class="required">*</span></label>
+                            <input type="text" id="bulk_image_chapter" placeholder="e.g., Cell Biology" required />
+                        </div>
                     </div>
                 </div>
 
@@ -1102,6 +1135,9 @@
             document.getElementById('testFullSyllabus').style.display = 'none';
             document.getElementById('createTestCard').style.display = 'none';
             
+            // ✅ Show bulk fields when going back
+            showBulkFields();
+            
             if (type === 'chapterwise') {
                 document.getElementById('testChapterwise').style.display = 'block';
             } else if (type === 'weekly') {
@@ -1124,11 +1160,47 @@
             if (type) {
                 document.getElementById('testType').value = type;
             }
+            
+            document.getElementById('createTestCard').scrollIntoView({ behavior: 'smooth' });
         }
 
         function hideCreateTest() {
             document.getElementById('createTestCard').style.display = 'none';
             document.getElementById('testChapterwise').style.display = 'block';
+            showBulkFields();
+        }
+
+        // ============================================
+        // ===== HIDE/SHOW BULK UPLOAD FIELDS =====
+        // ============================================
+        function hideBulkFields() {
+            const fields = document.getElementById('bulkFormFields');
+            const infoMsg = document.getElementById('autoFilledInfo');
+            
+            if (fields) {
+                fields.style.display = 'none';
+            }
+            if (infoMsg) {
+                infoMsg.classList.add('show');
+                const chapterName = document.getElementById('bulk_image_chapter').value || 'Test';
+                const subjectName = document.getElementById('bulk_image_subject').value;
+                const subjectMap = { '1': 'Physics', '2': 'Chemistry', '3': 'Biology' };
+                const subjectDisplay = subjectMap[subjectName] || 'Auto-detected';
+                infoMsg.querySelector('span').textContent = 
+                    `✅ Test details auto-filled! Section=Test Series, Subject=${subjectDisplay}, Chapter="${chapterName}"`;
+            }
+        }
+
+        function showBulkFields() {
+            const fields = document.getElementById('bulkFormFields');
+            const infoMsg = document.getElementById('autoFilledInfo');
+            
+            if (fields) {
+                fields.style.display = 'block';
+            }
+            if (infoMsg) {
+                infoMsg.classList.remove('show');
+            }
         }
 
         function addChapterRow() {
@@ -1210,6 +1282,12 @@
 
             try {
                 const token = localStorage.getItem('token');
+                if (!token) {
+                    showError('Please login first');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
                 const response = await fetch(`${API_BASE}/api/admin/create-test`, {
                     method: 'POST',
                     headers: {
@@ -1222,11 +1300,50 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Store test info in sessionStorage
+                    sessionStorage.setItem('testId', data.testId);
+                    sessionStorage.setItem('testName', name);
+                    sessionStorage.setItem('testType', type);
+                    sessionStorage.setItem('testSubject', subject);
+
                     showSuccess('✅ Test created successfully! Now upload questions.');
+                    
+                    // AUTO-FILL the bulk upload form
                     document.getElementById('bulk_image_section').value = 'testseries';
+                    
+                    // Map subject name to ID
+                    const subjectMap = {
+                        'Physics': '1',
+                        'Chemistry': '2',
+                        'Biology': '3',
+                        'All': '1'
+                    };
+                    const subjectId = subjectMap[subject] || '1';
+                    document.getElementById('bulk_image_subject').value = subjectId;
+                    
+                    // Auto-fill Chapter with test name
                     document.getElementById('bulk_image_chapter').value = name;
+                    
+                    // ✅ HIDE the fields and show info message
+                    hideBulkFields();
+                    
+                    // Hide create test card
                     document.getElementById('createTestCard').style.display = 'none';
+                    
+                    // Show auto-fill notification
+                    const notification = document.getElementById('autoFillNotification');
+                    const text = document.getElementById('autoFillText');
+                    const subjectDisplay = subject || 'Physics';
+                    text.textContent = `✅ Auto-filled: Section=Test Series, Subject=${subjectDisplay}, Chapter="${name}"`;
+                    notification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 5000);
+                    
+                    // Scroll to bulk upload
                     document.getElementById('bulkImageForm').scrollIntoView({ behavior: 'smooth' });
+
                 } else {
                     showError(data.error || 'Failed to create test');
                 }
