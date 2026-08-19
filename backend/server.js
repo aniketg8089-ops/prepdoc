@@ -292,36 +292,46 @@ app.get('/api/tests/:id/with-chapters', async (req, res) => {
     }
 });
 
-// ===== GET WEEKLY TESTS =====
+// ===== GET WEEKLY TESTS (FIXED) =====
 app.get('/api/tests/weekly', async (req, res) => {
     try {
-        const tests = await db.all(
-            `SELECT t.*, 
-             (SELECT json_agg(json_build_object('name', tc.chapter_name, 'subject', tc.subject)) 
-              FROM test_chapters tc WHERE tc.test_id = t.id) as chapters
-             FROM tests t 
-             WHERE t.category = 'weekly' 
-             ORDER BY t.created_at DESC`
-        );
+        const tests = await db.all(`
+            SELECT 
+                t.*,
+                COALESCE(
+                    (SELECT json_agg(json_build_object('name', tc.chapter_name, 'subject', tc.subject)) 
+                     FROM test_chapters tc WHERE tc.test_id = t.id),
+                    '[]'::json
+                ) as chapters
+            FROM tests t 
+            WHERE t.category::text = 'weekly'
+            ORDER BY t.created_at DESC
+        `);
         res.json(tests);
     } catch (err) {
+        console.error('❌ Error fetching weekly tests:', err);
         res.status(500).json({ error: err.message });
     }
 });
 
-// ===== GET FULL SYLLABUS TESTS =====
+// ===== GET FULL SYLLABUS TESTS (FIXED) =====
 app.get('/api/tests/full', async (req, res) => {
     try {
-        const tests = await db.all(
-            `SELECT t.*, 
-             (SELECT json_agg(json_build_object('name', tc.chapter_name, 'subject', tc.subject)) 
-              FROM test_chapters tc WHERE tc.test_id = t.id) as chapters
-             FROM tests t 
-             WHERE t.category = 'full' 
-             ORDER BY t.created_at DESC`
-        );
+        const tests = await db.all(`
+            SELECT 
+                t.*,
+                COALESCE(
+                    (SELECT json_agg(json_build_object('name', tc.chapter_name, 'subject', tc.subject)) 
+                     FROM test_chapters tc WHERE tc.test_id = t.id),
+                    '[]'::json
+                ) as chapters
+            FROM tests t 
+            WHERE t.category::text = 'full'
+            ORDER BY t.created_at DESC
+        `);
         res.json(tests);
     } catch (err) {
+        console.error('❌ Error fetching full tests:', err);
         res.status(500).json({ error: err.message });
     }
 });
